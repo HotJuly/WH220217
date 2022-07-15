@@ -8,7 +8,7 @@
 	4) v-model
 	5) .sync
 	6) $attrs与$listeners
-	7) $ref & $children & $parent
+	7) $refs & $children & $parent
 	8) provide与inject
 	9) Vuex
 	10) 插槽
@@ -181,5 +181,3 @@
     4) 应用
     	element-ui中绝大部分组件都用了插槽
     	element-ui中的 table-column 组件使用了作用域插槽
-
-## 
