@@ -2,7 +2,7 @@
     <el-tooltip class="item" effect="dark" :content="content" placement="top-start">
         <!-- <el-button :type="type" :size="size" @click="handleClick">删除</el-button> -->
         <!-- <el-button v-bind="$attrs" @click="$emit('click')">删除</el-button> -->
-        <el-button v-bind="$attrs" v-on="$listeners">删除</el-button>
+        <el-button :size="$attrs.size" v-bind="{...$attrs}" v-on="{...$listeners}">删除</el-button>
     </el-tooltip>
 </template>
 
@@ -17,6 +17,11 @@ export default {
 
         // $listeners会收集当前组件身上所有的自定义事件,事件名作为key,回调函数作为value
         // console.log(this.$listeners)
-    }
+    },
+    // methods:{
+    //     a(value1,...args){
+
+    //     }
+    // }
 }
 </script>

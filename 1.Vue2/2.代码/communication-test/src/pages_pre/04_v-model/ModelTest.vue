@@ -39,6 +39,21 @@
     <br />
     <CustomInput title="来自于父组件的msg2" :value="msg2" @input="changeMsg2" />
     <br />
+    <!-- 
+      v-model 双向数据绑定
+        什么是双向?
+          1.父向子(标签属性+props实现)
+            Vue固定了标签属性名一定是value
+              标签属性名:value
+              标签属性值:数据是开发者传入的状态数据(例如此处的msg2)
+
+          2.子向父(自定义事件)
+            自定义事件的重点
+              1.事件名:Vue取得,固定为input
+              2.事件回调函数:Vue创建的,该函数的this一定是当前组件的实例对象(你看不见的方法)
+
+            作用:将对应的状态数据的值修改为子组件传上来的值
+     -->
     <CustomInput title="来自于父组件的msg2" v-model="msg2" />
   </div>
 </template>
@@ -62,6 +77,7 @@ export default {
       this.msg2 = value;
     },
     changeMsg2(value) {
+      // methods中的方法,this一定是当前组件实例对象
       this.msg2 = value;
     }
   }

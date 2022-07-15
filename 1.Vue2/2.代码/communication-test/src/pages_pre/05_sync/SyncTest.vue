@@ -19,6 +19,7 @@
           v-model的事件名默认是input
           .sync的事件名是"update:" + "属性名"
        -->
+    <!-- <Child1 :total="total" @update:total="(value)=>{total=value}"/> -->
     <Child1 :total.sync="total"/>
 
   </div>

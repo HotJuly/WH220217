@@ -14,6 +14,7 @@ new Vue({
   beforeCreate(){
     // Vue.prototype.$bus = this;
   },
+  // 扩展:vm.$root找到的是这个Vue实例对象,不是App,VueRouter源码中有使用到
   render: h => h(App),
   router,
   store
