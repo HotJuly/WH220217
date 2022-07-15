@@ -4,7 +4,7 @@
     <h2>需求: 自定义带Hover提示的按钮</h2>
     <!-- <el-button type="danger" size="small" @click="handleClick">删除</el-button> -->
 
-    <HintButtonVue content="该操作很危险,请注意" type="danger" size="small" @click123="handleClick" />
+    <!-- <HintButtonVue content="该操作很危险,请注意" type="danger" size="small" @click123="handleClick" /> -->
     <HintButtonVue content="该操作很危险,请注意" type="primary" size="big" @click="handleClick" />
 
   </div>
