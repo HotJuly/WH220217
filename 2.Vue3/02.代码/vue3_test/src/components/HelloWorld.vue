@@ -1,58 +1,68 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h2>名字:{{obj2.name}}</h2>
-    <h2>年龄:{{obj2.age}}</h2>
-    <button @click="changeName">改名</button>
+    <h1>count:{{ count }}</h1>
+    <h1 @click="handleClick">count2:{{ count2 }}</h1>
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { listenerCount } from 'process';
+import { ref, reactive } from 'vue';
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
   },
-  setup(){
-
-    /*
-      reactive
-        他可以根据元对象产生一个全新的响应式对象的函数
-        reactive对对象进行使用
-        ref对基本数据类型使用
-    
-    */
-
-    // 元对象
-    // 操作元对象没有响应式效果
-    const obj = {
-      name:"小明",
-      age:28
-    }
-
-    //这个是新生成的代理对象
-    // 操作代理对象具有响应式的效果
-    const obj2 = reactive(obj);
-
-    // console.log(obj2,obj)
-    // console.log(obj2===obj)
-
-    const changeName = ()=>{
-      // obj.name = "王" + obj.name;
-
-      // 当我们操作代理对象的时候,代理对象也会对元对象做相同的事情
-      obj2.name = "王" + obj.name;
-      console.log(obj2)
-    }
-
-    return {
-      obj,
-      obj2,
-      changeName
+  data(){
+    return{
+      count:2
     }
   },
+  setup() {
+
+    return {
+    }
+  },
+  /*
+    watch和computed的区别
+      相同点:
+        1.他们都可以监视响应式属性的变化
+        2.数据类型相同
+
+      不同点:
+        1.使用场景不同
+          computed->我现在需要一个数据,但是我没有,但是可以根据已有数据计算得到
+            购物车总价,总数
+              根据现有的购物车数组,将数量*单价,最终累加所有商品,可以得到总价数据
+
+          watch->当某个数据发生变化的时候,我想要做一些事情(事情就是函数)
+            当地址栏中的keyword,我们需要重新请求最新的数据
+
+
+          小总结:computed更注重于结果,watch更注重于过程
+  
+  
+  */
+  // computed:{
+  //   total(){
+  //     return list.reduce((pre,item)=>{
+  //       const price = item.num * item.price;
+  //       return pre+price
+  //     },0)
+  //   }
+  // },
+  // watch:{
+  //   "$route.query.keyword"(value){
+  //     getData(value);
+  //     return 123;
+  //   }
+  // }
 }
+</script>
+
+<script setup>
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -60,14 +70,17 @@ export default {
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
   display: inline-block;
   margin: 0 10px;
 }
+
 a {
   color: #42b983;
 }
