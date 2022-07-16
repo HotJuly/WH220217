@@ -1,35 +1,31 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h1>count:{{ count }}</h1>
+    <input type="text" ref="input666">
   </div>
 </template>
 
 <script>
-import { ref, onUpdated } from 'vue';
+import { onMounted, ref } from 'vue';
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
   },
   setup() {
+    const input666 = ref(null);
 
-    const count = ref(1);
+    onMounted(()=>{
+      // console.log(input666)
+      // Vue2,写法this.$refs.input666
+      input666.value.focus();
+    })
 
-    // 请求回来的数据如果是有数据的,我就在组件更新的时候做些事,比如说打印console.log(1)
-    // 请求回来的数据如果是空的,我就在updated中不做任何
-    // if(data){
-    //   onUpdated(() => {
-    //     console.log(1)
-    //   })
-    // }
     return {
-      count,
+      input666
     }
   },
-  // updated(){
-  //   // 数据更新结束,视图更新结束之后才会执行
-  // }
+  // mounted(){}
 }
 </script>
 

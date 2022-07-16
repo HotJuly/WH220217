@@ -69,9 +69,9 @@ export default {
   // beforeMount(){
   //   console.log('--------beforeMount--------')
   // },
-  // mounted(){
-  //   console.log('--------mounted--------')
-  // }
+  mounted(){
+    console.log('--------mounted--------')
+  }
 }
 </script>
 
