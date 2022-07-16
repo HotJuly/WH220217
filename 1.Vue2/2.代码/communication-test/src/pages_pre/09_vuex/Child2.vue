@@ -14,6 +14,14 @@ export default {
   methods: {
     ...mapMutations(["addSync"]),
     ...mapActions(["addAsync"]),
+
+    // 以上写法等同于以下写法
+    // addSync(value) {
+    //   this.$store.commit("addSync", value);
+    // },
+    // addAsync(value) {
+    //   this.$store.dispatch("addAsync", value);
+    // },
   },
 };
 </script>
