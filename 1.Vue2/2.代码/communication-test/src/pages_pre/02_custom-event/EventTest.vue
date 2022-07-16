@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <h1>组件间通信2: vue自定义事件</h1>
-    <p>count: {{count}}</p>
+    <p>count: {{ count }}</p>
 
     <!-- 
       在Vue中,事件分为两种
@@ -26,52 +26,52 @@
      -->
     <h2>原生事件监听</h2>
     <button @click="handleClick">原生事件监听1</button>
-    <button @click="handleClick1(2,$event)">原生事件监听2</button>
+    <button @click="handleClick1(2, $event)">原生事件监听2</button>
 
-    <br/>
+    <br />
 
-    <Event1 @click.native="handleClick"/>
+    <Event1 @click.native="handleClick" />
 
     <h2>自定义事件监听</h2>
     <!-- 即便是同一个组件,在页面上使用标签显示两次,会产生两个不同的组件实例对象,生命周期也会分别执行 -->
-    <Event2 @click123="handleClick"/>
-    <Event2 @click666="addCount"/>
+    <Event2 @click123="handleClick" />
+    <Event2 @click666="addCount" />
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-  import Event1 from './Event1.vue'
-  import Event2 from './Event2.vue'
+import Event1 from './Event1.vue'
+import Event2 from './Event2.vue'
 
-  export default {
-    name: 'EventTest',
+export default {
+  name: 'EventTest',
 
-    data () {
-      return {
-        count: 0
-      }
+  data () {
+    return {
+      count: 0
+    }
+  },
+  methods:{
+    handleClick(event){
+      // 形参是浏览器传递给我们的,事件对象,内部会存放与当前事件相关的所有数据
+      // event.target内部存放的是当前事件触发流程中,最内层的目标元素
+      const text = event.target.innerText;
+      alert(text)
     },
-    methods:{
-      handleClick(event){
-        // 形参是浏览器传递给我们的,事件对象,内部会存放与当前事件相关的所有数据
-        // event.target内部存放的是当前事件触发流程中,最内层的目标元素
-        const text = event.target.innerText;
-        alert(text)
-      },
-      handleClick1(value,event){
-        // 形参是浏览器传递给我们的,事件对象,内部会存放与当前事件相关的所有数据
-        // event.target内部存放的是当前事件触发流程中,最内层的目标元素
-        const text = event.target.innerText;
-        alert(text+value)
-      },
-      addCount(value){
-        this.count+=value;
-      }
+    handleClick1(value,event){
+      // 形参是浏览器传递给我们的,事件对象,内部会存放与当前事件相关的所有数据
+      // event.target内部存放的是当前事件触发流程中,最内层的目标元素
+      const text = event.target.innerText;
+      alert(text+value)
     },
+    addCount(value){
+      this.count+=value;
+    }
+  },
 
-    components: {
-      Event1,
-      Event2,
-    },
-  }
+  components: {
+    Event1,
+    Event2,
+  },
+}
 </script>

@@ -23,7 +23,7 @@ export default {
     props:["content"],
     mounted(){
         // 没有被props接收的标签属性,都会存放在$attrs中
-        console.log(this.$attrs)
+        // console.log(this.$attrs)
 
         // $listeners会收集当前组件身上所有的自定义事件,事件名作为key,回调函数作为value
         // console.log(this.$listeners)
