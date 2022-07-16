@@ -1,40 +1,57 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <h2>名字:{{obj2.name}}</h2>
+    <h2>年龄:{{obj2.age}}</h2>
+    <button @click="changeName">改名</button>
   </div>
 </template>
 
 <script>
+import { reactive } from 'vue';
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
-  }
+  },
+  setup(){
+
+    /*
+      reactive
+        他可以根据元对象产生一个全新的响应式对象的函数
+        reactive对对象进行使用
+        ref对基本数据类型使用
+    
+    */
+
+    // 元对象
+    // 操作元对象没有响应式效果
+    const obj = {
+      name:"小明",
+      age:28
+    }
+
+    //这个是新生成的代理对象
+    // 操作代理对象具有响应式的效果
+    const obj2 = reactive(obj);
+
+    // console.log(obj2,obj)
+    // console.log(obj2===obj)
+
+    const changeName = ()=>{
+      // obj.name = "王" + obj.name;
+
+      // 当我们操作代理对象的时候,代理对象也会对元对象做相同的事情
+      obj2.name = "王" + obj.name;
+      console.log(obj2)
+    }
+
+    return {
+      obj,
+      obj2,
+      changeName
+    }
+  },
 }
 </script>
 
