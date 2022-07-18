@@ -15,3 +15,7 @@
 4.vue3_test
 
 ​	用于练习Vue3的基础语法(组合API)
+
+5.ts-cli
+
+​	用于练习TypeScript的基础内容(接口,函数,泛型)
