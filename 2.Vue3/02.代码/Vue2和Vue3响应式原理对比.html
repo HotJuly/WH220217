@@ -1,0 +1,104 @@
+<html>
+
+    <head></head>
+
+    <body>
+        <h1>A</h1>
+        <script>
+            // 元对象
+            const obj = {
+                name:"xiaoming",
+                age:"23"
+            }
+
+            // const obj2 = reactive(obj)
+            const proxyObj = new Proxy(obj,{
+                get(target,key){
+                    // console.log('get')
+
+                    // return target[key]
+                    return Reflect.get(target,key)
+                },
+                set(target,key,value){
+                    console.log('set',target,key,value)
+
+                    // target[key] = value;
+                    Reflect.set(target,key,value)
+                    // obj.name = '小明777'
+
+                    // 通知视图更新
+                    // dep.notify()
+                },
+                deleteProperty(target,key){
+                    // console.log('deleteProperty')
+
+                    // delete target[key]
+                    Reflect.deleteProperty(target,key)
+                    // 通知视图更新
+                },
+                getPrototypeOf(){
+                    return{
+                        name:"老王"
+                    }
+                },
+                has(){
+                    return true;
+                }
+            })
+
+            // console.log(proxyObj)
+            // proxyObj.name="xiaoming666"
+            // proxyObj.sex = "男"
+            // delete proxyObj.name;
+            // console.log(proxyObj.name)
+
+            console.log(Object.getPrototypeOf(proxyObj))
+
+            console.log("a" in proxyObj)
+
+            // const arr = [1,2,3,4,5,6];
+
+            // const proxyArr = new Proxy(arr,{
+            //     get(){
+            //         console.log('get')
+            //     },
+            //     set(target,key,value){
+            //         console.log('set',target,key,value)
+            //         // target[key] = value;
+            //     }
+            // })
+
+            // proxyArr[2] = 7;
+
+
+            // Object.defineProperty(obj,"sex",{
+            //     // value:"男"
+            //     get(){
+            //         console.log(11111)
+            //         return obj.name;
+            //     },
+            //     set(value){
+            //         console.log('set')
+            //         obj.age = value;
+            //     }
+            // })
+
+            /* 需求:当属性值发生变化的时候,页面也要发生变化
+                拆解:
+                    1.如何能知道一个属性值发生变化
+                        也就是说需要将对应的这个属性修改成具有get和set方法的格式
+                            如果开发者修改该属性的值,就会触发这个set方法
+                            如果开发者读取该属性的值,就会触发这个get方法
+                                该类对象不具有自己的value值,如果你想要读取他的结果,他会将get函数的返回值给你看
+
+                    2.如何让页面也发生变化
+                        操作对应的真实DOM对象(也成为原生DOM对象)
+
+            */
+
+            // console.log(obj.sex)
+            // obj.sex=777
+            // console.log(obj)
+        </script>
+    </body>
+</html>
