@@ -19,22 +19,26 @@ export default {
 
     const count = ref(1);
 
+    const obj = reactive({
+      age: 28
+    })
+
     /*
       computed
         他是一个返回计算属性的函数
     
     */
 
-    const doubleCount = computed(()=>{
-      return count.value*2
+    const doubleCount = computed(() => {
+      return count.value * 2
     });
 
     const ThreeCount = computed({
-      get(){
+      get() {
         // 访问/读取当前计算属性的结果时会执行
         return count.value * 3
       },
-      set(value){
+      set(value) {
         // 给当前计算属性赋值的时候会触发
         // console.log('ThreeCount set',value)
         count.value = value;
@@ -43,9 +47,9 @@ export default {
 
     // console.log(ThreeCount)
 
-    setTimeout(()=>{
+    setTimeout(() => {
       ThreeCount.value = 9;
-    },2000)
+    }, 2000)
 
     // 此处千万不要写成count.value,否则会失去监视效果
     // watch(count,(newValue,oldValue)=>{
@@ -70,6 +74,24 @@ export default {
     //  如果现在具有100个属性,我都想监视,watchEffect
     // 如果现在具有1个属性需要监视,watch||watchEffect
     // 如果现在具有5个属性,但是其中4个,只能使用watch
+
+
+// console.log(111,obj.age)
+
+// 错误写法
+    // watch(obj.age, (newValue, oldValue) => {
+    //   console.log('count change', newValue)
+    // }, { immediate: true, deep: true });
+
+    
+// 相当于"$route.query.keyword"(newValue,oldValue){
+  //     getData(value);
+  //   },
+  // 如果监视的是一个ref对象,直接写ref对象的名称
+  // 如果监视的是一个reactive对象中的某个属性,需要写成函数形式,该函数返回你想监视的属性值
+    // watch(()=>obj.age, (newValue, oldValue) => {
+    //   console.log('count change', newValue)
+    // }, { immediate: true, deep: true });
 
     return {
       count,
@@ -107,10 +129,10 @@ export default {
   //       return pre+price
   //     },0)
   //   }
-    // a:{
-    //   get(){},
-    //   set(){}
-    // }
+  // a:{
+  //   get(){},
+  //   set(){}
+  // }
   // },
   // watch:{
   //   "$route.query.keyword"(newValue,oldValue){
