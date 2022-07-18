@@ -7,7 +7,7 @@
       <button @click="updateCount(2)">更新自己的数据</button>
     </p>
     
-    <Child/>
+    <Child :count="count" :updateCount="updateCount"/>
 
   </div>
 </template>
@@ -15,9 +15,14 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import Child from './Child.vue'
+// Vue3 setup中引入的文件内容,可以直接在template使用
 
 const count = ref<number>(0)
-const updateCount =  (num: number) => {
+
+// count.value="222";
+
+// 函数的作用域与函数声明位置有关,与调用位置无关
+const updateCount =  (num:number) => {
   count.value += num
 }
 </script>

@@ -5,13 +5,22 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'Child1',
-  data () {
-    return {
-      msg: 'abc'
-    }
-  },
 }
+</script>
+
+
+<script setup lang="ts">
+import myBus from '@/myBus';
+import { ref } from 'vue';
+
+const msg = ref('abc');
+
+const changeMsg = (value:string)=>{
+  msg.value += value;
+}
+
+myBus.on("sendMsg",changeMsg)
 </script>
