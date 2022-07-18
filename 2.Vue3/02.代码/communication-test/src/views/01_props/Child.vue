@@ -35,6 +35,7 @@ const props = defineProps<Props>()
 const updateParent = ()=>{
   // const count =2;
   props.updateCount(3)
+  // props.updateCount
 }
 
 </script>
