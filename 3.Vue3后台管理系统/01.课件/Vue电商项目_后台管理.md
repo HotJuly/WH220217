@@ -355,9 +355,9 @@ actions: {
 /*
 1. 配置代理服务器   vite.config.ts
 2. 请求自动携带token请求头  utils/request.ts
-3. 登陆接口请求函数	api/acl/user.ts
+3. 登陆接口请求函数	api/acl/user.ts(不用做)
 4. 使用localStorage存储token utils/token-utils.ts
-5. pinia管理登陆用户信息  stores/userInfo.ts
+5. pinia管理登陆用户信息  stores/userInfo.ts(不用做)
 */
 ```
 
@@ -412,7 +412,7 @@ export const staticRoutes: Array<RouteRecordRaw> = [
   ...
   ...
 
-  /* 商品管理 start */
+  /* 商品管理 start 该路由对象与/的对象是兄弟关系,同级 */
   {
     path: '/product',
     name: 'Product',

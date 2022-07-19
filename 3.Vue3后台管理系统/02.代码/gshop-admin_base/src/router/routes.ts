@@ -45,6 +45,53 @@ import type { RouteRecordRaw } from 'vue-router';
     }]
   },
 
+  {
+    path:"/product",
+    component:()=>import('@/layout/index.vue'),
+    redirect:"/product/trademark/list",
+    children:[
+      {
+        path:"/product/trademark/list",
+        component:()=>import('@/views/product/trademark/index.vue'),
+        meta:{
+          title:"品牌管理"
+        }
+      },
+      {
+        path:"/product/attr/list",
+        component:()=>import('@/views/product/attr/index.vue'),
+        meta:{
+          title:"属性管理"
+        }
+      },
+      {
+        path:"/product/spu/list",
+        component:()=>import('@/views/product/spu/index.vue'),
+        meta:{
+          title:"spu管理"
+        }
+      },
+      {
+        path:"/product/sku/list",
+        component:()=>import('@/views/product/sku/index.vue'),
+        meta:{
+          title:"sku管理"
+        }
+      },
+      {
+        path:"/product/category/list",
+        component:()=>import('@/views/product/category/index.vue'),
+        meta:{
+          title:"分类管理"
+        }
+      }
+    ],
+    meta:{
+      title:"商品管理",
+      icon:"ele-ShoppingBag"
+    }
+  },
+
   /* 匹配任意的路由 必须最后注册 */
   { 
     path: '/:pathMatch(.*)', 

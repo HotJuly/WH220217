@@ -1,4 +1,5 @@
-const TokenKey = 'vue_admin_template_token'
+// const TokenKey = 'vue_admin_template_token'
+const TokenKey = 'atguigu_admin_token'
 
 export function getToken() {
   return localStorage.getItem(TokenKey)
