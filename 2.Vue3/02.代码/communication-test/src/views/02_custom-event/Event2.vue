@@ -24,6 +24,10 @@
 // 完整说法:临时声明一个'click'数据类型,注意该类型只有字符串'click'满足他的要求
 //          第一个实参的数据类型必须满足类型'click'的要求
 
+// Vue3最新特性,如果一个组件标签上具有绑定事件的语法@click="回调函数"
+// 如果该组件使用defineEmits声明接收该事件,他就是自定义事件
+// 如果该组件没有使用defineEmits声明接收该事件,那他默认就是原生事件,自动绑定在根节点身上
+
 interface Emits{
   (event:'click'):void
   (event:'xxx',data:MouseEvent):void

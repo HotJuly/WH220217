@@ -6,10 +6,8 @@
     <!-- 
       原生标签上的本质: 动态value属性 + 原生input监听(将输入的最新值保存到属性上)
     -->
-    <input type="text">
-    <span>{{msg1}}</span><br>
-    <input type="text">
-    <span>{{msg2}}</span>
+    <input type="text" v-model="msg1">
+    <span>{{ msg1 }}</span><br>
 
     <br>
     <br>
@@ -20,25 +18,27 @@
     <!-- 
       组件标签上的本质: 动态value属性 + 自定义input监听(将子组件分发数据保存父组件的属性上)
     -->
-    
-    
+    msg3:{{msg3}}
+    <custom-input v-model:msg3="msg3"/>
+    <!-- <custom-input :msg3.sync="msg3"/> -->
+    <!-- <custom-input :modelValue="msg3" @update:modelValue="(data)=>{msg3=data}"/> -->
   </div>
 </template>
 
-<script type="text/ecmascript-6">
-  import CustomInput from './CustomInput.vue'
-  export default {
-    name: 'ModelTest',
-    data () {
-      return {
-        msg1: 'abc',
-        msg2: 'atguigu',
-        msg3: 'haha',
-        msg4: 'hehe'
-      }
-    },
-    components: {
-      CustomInput
-    }
+<script lang="ts">
+export default {
+  name: 'ModelTest',
+  components: {
+    CustomInput
   }
+}
+</script>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import CustomInput from './CustomInput.vue'
+const msg1 = ref('abc')
+const msg2 = ref('atguigu')
+const msg3 = ref('haha')
+const msg4 = ref('hehe')
 </script>

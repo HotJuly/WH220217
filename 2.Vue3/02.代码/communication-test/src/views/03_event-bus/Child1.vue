@@ -22,5 +22,5 @@ const changeMsg = (value:string)=>{
   msg.value += value;
 }
 
-myBus.on("sendMsg",changeMsg)
+myBus.on("sendMsg",(value:string)=>{})
 </script>
