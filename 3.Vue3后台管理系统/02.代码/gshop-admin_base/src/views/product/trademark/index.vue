@@ -11,6 +11,8 @@
             <el-table-column type="index" label="序号" align="center" width="100" />
             <el-table-column prop="tmName" label="品牌名称" />
             <el-table-column label="品牌LOGO">
+
+                <!-- 声明使用插槽来自定义table表格该列中显示的内容 -->
                 <template #default="scope">
                     <el-image style="width: 100px; height: 100px" :src="scope.row.logoUrl"></el-image>
                     <!-- {{scope.row}} -->
@@ -24,6 +26,7 @@
             </el-table-column>
         </el-table>
 
+        <!-- pagination组件可以通过layout属性控制分页器内容的排列顺序 -->
         <el-pagination v-model:currentPage="currentPage" v-model:page-size="pageSize" :page-sizes="[3, 6, 9, 12]"
             layout="prev, pager, next, jumper,->, sizes,total" :total="total"
             @current-change="handleCurrentChange" @size-change="handleSizeChange" />
@@ -36,12 +39,19 @@ import { ref, onMounted } from 'vue'
 
 import { getTrademarkPageListApi } from '@/api/product/trademark'
 
+// 用于控制table组件显示的数据
 const tableData = ref([]);
 
+// 用于存储当前处于第几页
 const currentPage = ref(1);
+
+// 用于存储当前页面显示数据条数
 const pageSize = ref(3);
+
+// 用于存储当前品牌总数量
 const total = ref();
 
+// 用于发送请求获取当前品牌列表数据,并自动更新到对应的响应数据中
 const getTrademarkPageList = async () => {
     const result = await getTrademarkPageListApi(currentPage.value, pageSize.value);
     console.log(result);
@@ -49,6 +59,7 @@ const getTrademarkPageList = async () => {
     total.value = result.total;
 }
 
+// 该方法会交给分页器组件,用于监视用户修改当前页数操作
 const handleCurrentChange = (page:number)=>{
     // console.log(page)
     // Vue更新数据是同步更新,页面是异步更新
@@ -58,6 +69,7 @@ const handleCurrentChange = (page:number)=>{
     getTrademarkPageList()
 }
 
+// 该方法会交给分页器组件,用于监视用户修改当前页面显示条数操作
 const handleSizeChange = (size:number)=>{
     // console.log(size)
     currentPage.value = 1;
