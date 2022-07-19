@@ -29,5 +29,8 @@
     }
   })
 
+  provide("content1111",state.content1)
+  provide("content2222",state.content2)
+
 
 </script>

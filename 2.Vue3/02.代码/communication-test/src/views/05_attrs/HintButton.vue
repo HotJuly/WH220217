@@ -20,6 +20,8 @@ defineProps(["content"])
 // Vue3中没有这个家伙了
 // Vue3中$attrs对象等于Vue2中的$attrs+$listeners
 
+// 模版中常见的预留关键字:$emit,$event,$attrs
+
 const attrs = useAttrs();
 console.log(attrs)
 </script>

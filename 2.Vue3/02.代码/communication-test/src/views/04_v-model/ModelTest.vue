@@ -19,6 +19,7 @@
       组件标签上的本质: 动态value属性 + 自定义input监听(将子组件分发数据保存父组件的属性上)
     -->
     msg3:{{msg3}}
+    <CustomInput v-model:msg3="msg3"/>
     <custom-input v-model:msg3="msg3"/>
     <!-- <custom-input :msg3.sync="msg3"/> -->
     <!-- <custom-input :modelValue="msg3" @update:modelValue="(data)=>{msg3=data}"/> -->
