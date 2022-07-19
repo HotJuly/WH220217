@@ -1,16 +1,19 @@
 <template>
     <div>
-        <h2>当前点击次数:{{store.state.count}}</h2>
+        <h2>当前点击次数:{{store.count}}</h2>
         <button @click="add">点击次数+1</button>
     </div>
 </template>
 
 <script setup>
-import {useStore} from 'vuex'
-const store = useStore();
+import { useCounterStore } from '@/stores/counter';
+// import {useStore} from 'vuex'
+// const store = useStore();
+
+const store = useCounterStore();
 
 const add = ()=>{
-    store.commit('addCount');
+    store.addCount(3)
 }
 </script>
 

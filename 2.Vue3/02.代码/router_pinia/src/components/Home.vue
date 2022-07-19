@@ -1,14 +1,18 @@
 <template>
     <div>
         Home
-        <h1>当前一共点击{{store.state.count}}次,是{{store.getters.evenOrOdd}}</h1>
+        <h1>当前一共点击{{count}}次,是{{evenOrOdd}}</h1>
+        <!-- <h1>当前一共点击{{store.count}}次,是{{store.evenOrOdd}}</h1> -->
         <input type="text" />
     </div>
 </template>
 
 <script setup>
-import {useStore} from 'vuex'
-const store = useStore();
+import { useCounterStore } from '@/stores/counter.js';
+
+// const store = useCounterStore();
+const { count, evenOrOdd } = useCounterStore();
+
 // console.log(store)
 
 </script>

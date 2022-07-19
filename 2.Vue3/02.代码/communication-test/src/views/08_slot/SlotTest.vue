@@ -11,6 +11,11 @@
           color:scope.row.isComplete?'green':'red'
         }">{{scope.row.text}}</span>
       </template>
+      <!-- <template #header="scope">
+        <span :style="{
+          color:scope.row.isComplete?'green':'red'
+        }">{{scope.row.text}}</span>
+      </template> -->
     </List>
 
     <h2>效果二: 显示TODO列表时, 带序号, TODO的颜色为蓝绿搭配</h2>

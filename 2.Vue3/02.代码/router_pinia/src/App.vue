@@ -1,5 +1,6 @@
 <template>
   <h1>App</h1>
+  <router-view></router-view>
   <!-- <keep-alive>
     <router-view></router-view>
   </keep-alive> -->
@@ -12,7 +13,7 @@
 
   <router-link to="/home">toHome</router-link>
   <router-link to="/about">toAbout</router-link>
-  <!-- <button @click="toAbout">toAbout</button> -->
+  <button @click="toAbout">toAbout</button>
 </template>
 
 <script>
@@ -23,7 +24,9 @@ export default {
 </script>
 
 <script setup>
-// import {useRouter} from 'vue-router';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 /*
   VueRouter控制用户跳转的方式
     1.编程式导航
@@ -35,13 +38,17 @@ export default {
       定义:通过标签形式引导用户进行跳转,这类操作称为声明式导航
 */
 
+// (function () {
+//   const router = useRouter();
+//   console.log(router);
+// })();
+
+
 const toAbout = () => {
   // $router提供操作历史记录栈的方法
   // this.$router.push()
-
-  // const router = useRouter();
-  // console.log(useRouter);
-  // router.push("/about")
+  // console.log(router);
+  router.push("/about")
 }
 
 

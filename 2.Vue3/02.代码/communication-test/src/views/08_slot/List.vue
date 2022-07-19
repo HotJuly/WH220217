@@ -4,6 +4,7 @@
       <li v-for="(item, index) in data" :key="index">
         <!-- {{item.text}} -->
         <slot :row="item" :$index="index"/>
+        <!-- <slot name="header" :row="item" :$index="index"/> -->
       </li>
     </ul>
   </div>
