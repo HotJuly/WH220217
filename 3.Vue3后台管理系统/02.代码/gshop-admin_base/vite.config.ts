@@ -39,16 +39,18 @@ export default defineConfig((mode: ConfigEnv) => {
       },
     },
 
-    proxy: {
-      "/app-dev": {
-        // 代理所有以 '/app-dev'开头的请求路径
-        // 后台接口地址
-        // 备用网址:'http://sph-h5-api.atguigu.cn/'
-        target: "http://gmall-h5-api.atguigu.cn/",
-        // 服务器得到的就不是当前应用的域名了, 而是后台的域名
-        changeOrigin: true,
-        // 重写路径: 去掉路径中开头的'/dev-api'
-        rewrite: (path: any) => path.replace(/^\/app-dev/, ""),
+    server: {
+      open: true, // 自动打开浏览器访问
+      proxy: {
+        '/app-dev': { // 代理所有以 '/app-dev'开头的请求路径
+          // 后台接口地址
+          // 备用网址:'http://sph-h5-api.atguigu.cn/' 
+          target: 'http://gmall-h5-api.atguigu.cn/',
+          // 服务器得到的就不是当前应用的域名了, 而是后台的域名
+          changeOrigin: true,
+          // 重写路径: 去掉路径中开头的'/dev-api'
+          rewrite: (path) => path.replace(/^\/app-dev/, ''),
+        },
       },
     },
   };
