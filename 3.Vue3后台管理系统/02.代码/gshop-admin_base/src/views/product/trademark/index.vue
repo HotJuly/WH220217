@@ -40,13 +40,12 @@
         <el-dialog v-model="dialogFormVisible" title="添加品牌">
             <el-form :model="form">
                 <el-form-item label="品牌名称" label-width="100px">
-                    <el-input v-model="form.name" autocomplete="off" />
+                    <el-input v-model="form.tmName" autocomplete="off" />
                 </el-form-item>
                 <el-form-item label="品牌LOGO" label-width="100px">
-                    <el-upload class="avatar-uploader"
-                        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
-                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-                        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                    <el-upload class="avatar-uploader" :action="`${BASE_URL}/admin/product/fileUpload`"
+                        :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                        <img v-if="form.logoUrl" :src="form.logoUrl" class="avatar" />
                         <el-icon v-else class="avatar-uploader-icon">
                             <Plus />
                         </el-icon>
@@ -55,23 +54,32 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">取消</el-button>
-                    <el-button type="primary" @click="dialogFormVisible = false">确定</el-button>
+                    <el-button @click="cancel">取消</el-button>
+                    <el-button type="primary" @click="save">确定</el-button>
                 </span>
             </template>
         </el-dialog>
     </el-card>
 </template>
 
+<script lang="ts">
+export default {
+    name: "Trademark"
+}
+</script>
+
 <script setup lang="ts">
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 
-import type { TrademarkListModel } from '@/api/product/model/TrademarkModel'
+import type { TrademarkListModel, TrademarkModel } from '@/api/product/model/TrademarkModel'
 
-import { getTrademarkPageListApi } from '@/api/product/trademark'
+import { getTrademarkPageListApi, saveTrademarkApi } from '@/api/product/trademark'
 import type { UploadProps } from 'element-plus'
+
+// 通过以下代码可以获取到当前运行环境中的部分环境变量,例如VITE_API_URL
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // 用于控制table组件显示的数据
 
@@ -93,16 +101,11 @@ const total = ref<number>();
 const dialogFormVisible = ref(false)
 
 // 用于收集用户输入的表单数据
-const form = reactive({
-    name: '',
-    region: '',
-    date1: '',
-    date2: '',
-    delivery: false,
-    type: [],
-    resource: '',
-    desc: '',
-})
+const initData = ()=>({
+    tmName: "",
+    logoUrl: ""
+});
+const form = reactive<TrademarkModel>(initData())
 
 const imageUrl = ref('')
 
@@ -140,22 +143,63 @@ const showDialog = () => {
 
 // 用于监视用户上传图片是否成功,如果成功就会执行该回调函数
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
-  response,
-  uploadFile
+    response
 ) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+    // console.log(response,uploadFile)
+    form.logoUrl = response.data;
 }
 
 // 用于监视用户上传图片操作,在上传图片之前可以对其进行判断,决定是否上传
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  if (rawFile.type !== 'image/jpeg') {
-    ElMessage.error('Avatar picture must be JPG format!')
-    return false
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!')
-    return false
-  }
-  return true
+    // 控制上传的文件类型,允许jpg,jpeg,png三种格式可以上传,其他都不可以
+
+    const types = ['image/jpeg','image/jpg','image/png']
+    // includes方法可以检查你所传入的实参,是否存在于前面的数组中,存在就返回true,否则false
+    if (!types.includes(rawFile.type)) {
+        ElMessage.error('图片格式必须是jpg/jpeg/png其中一种!')
+        return false
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+        ElMessage.error('图片大小最多为2MB!')
+        return false
+    }
+    return true
+}
+
+
+// 用于监视用户点击保存按钮,发送请求给服务器,添加品牌
+const save = async () => {
+    // 没有返回值,如果当前API请求成功,promise的状态就会变成成功,否则就是失败
+    await saveTrademarkApi(form);
+
+    // 用来隐藏dialog组件
+    dialogFormVisible.value = false;
+
+    // 弹出提示窗口提示用户
+    ElMessage({
+        message: '添加品牌成功',
+        type: 'success',
+    })
+
+    // 清空当前dialog展示的数据
+    // form = initData()
+    const data = initData();
+    // form.tmName = data.tmName;
+
+    // Object.assign(target,source)
+    // 当前API可以将后续来源对象的所有属性名和属性值都给目标对象target复制一份,
+    // 如果出现同名就以后者为准,也就是覆盖
+    Object.assign(form,data);
+
+    // 在发送请求之前,先讲currentPage修改为1,回到第一页,防止出现逻辑BUG
+    currentPage.value = 1;
+
+    // 发送请求,刷新当前的列表
+    getTrademarkPageList();
+}
+
+const cancel = ()=>{
+    dialogFormVisible.value = false;
+    Object.assign(form,initData());
 }
 
 onMounted(() => {
@@ -165,31 +209,31 @@ onMounted(() => {
 
 <style scoped>
 .avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
+    width: 178px;
+    height: 178px;
+    display: block;
 }
 </style>
 
 <style>
 .avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
+    border: 1px dashed var(--el-border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
 }
 
 .avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
+    border-color: var(--el-color-primary);
 }
 
 .el-icon.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  text-align: center;
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    text-align: center;
 }
 </style>
