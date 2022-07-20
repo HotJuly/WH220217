@@ -3,7 +3,9 @@ import type { TrademarkPageListModel, TrademarkModel } from './model/TrademarkMo
 
 enum Api{
     getTrademarkPageListApi = "/admin/product/baseTrademark",
-    saveTrademarkApi = "/admin/product/baseTrademark/save"
+    saveTrademarkApi = "/admin/product/baseTrademark/save",
+    updateTrademarkApi = "/admin/product/baseTrademark/update",
+    deleteTrademarkApi = "/admin/product/baseTrademark/remove"
 }
 
 /**
@@ -23,4 +25,15 @@ export const saveTrademarkApi = (trademark:TrademarkModel)=>{
 
     // post方法第一个参数是请求路径,第二个参数是请求体数据
     return request.post<any,null>(Api.saveTrademarkApi,trademark)
+}
+
+// 用于修改品牌数据
+export const updateTrademarkApi = (trademark:TrademarkModel)=>{
+
+    return request.put<any,null>(Api.updateTrademarkApi,trademark)
+}
+
+// 用于删除品牌数据
+export const deleteTrademarkApi = (id:number)=>{
+    return request.delete<any,null>(`${Api.deleteTrademarkApi}/${id}`)
 }

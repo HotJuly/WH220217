@@ -19,9 +19,9 @@
                 </template>
             </el-table-column>
             <el-table-column label="操作">
-                <template #default>
-                    <el-button type="warning" :icon="Edit" size="small"></el-button>
-                    <el-button type="danger" :icon="Delete" size="small"></el-button>
+                <template #default="{ row }">
+                    <el-button type="warning" :icon="Edit" size="small" @click="handleEdit(row)"></el-button>
+                    <el-button type="danger" :icon="Delete" size="small" @click="handleDelete(row)"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -37,7 +37,7 @@
             注意点:
                 el-form组件上必须具有model属性,属性值是用来收集存储数据的对象
          -->
-        <el-dialog v-model="dialogFormVisible" title="添加品牌">
+        <el-dialog v-model="dialogFormVisible" :title="`${title}品牌`">
             <el-form :model="form">
                 <el-form-item label="品牌名称" label-width="100px">
                     <el-input v-model="form.tmName" autocomplete="off" />
@@ -70,12 +70,12 @@ export default {
 
 <script setup lang="ts">
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 import type { TrademarkListModel, TrademarkModel } from '@/api/product/model/TrademarkModel'
 
-import { getTrademarkPageListApi, saveTrademarkApi } from '@/api/product/trademark'
+import { getTrademarkPageListApi, saveTrademarkApi, updateTrademarkApi, deleteTrademarkApi } from '@/api/product/trademark'
 import type { UploadProps } from 'element-plus'
 
 // 通过以下代码可以获取到当前运行环境中的部分环境变量,例如VITE_API_URL
@@ -101,7 +101,7 @@ const total = ref<number>();
 const dialogFormVisible = ref(false)
 
 // 用于收集用户输入的表单数据
-const initData = ()=>({
+const initData = () => ({
     tmName: "",
     logoUrl: ""
 });
@@ -153,7 +153,7 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
     // 控制上传的文件类型,允许jpg,jpeg,png三种格式可以上传,其他都不可以
 
-    const types = ['image/jpeg','image/jpg','image/png']
+    const types = ['image/jpeg', 'image/jpg', 'image/png']
     // includes方法可以检查你所传入的实参,是否存在于前面的数组中,存在就返回true,否则false
     if (!types.includes(rawFile.type)) {
         ElMessage.error('图片格式必须是jpg/jpeg/png其中一种!')
@@ -168,15 +168,23 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 
 // 用于监视用户点击保存按钮,发送请求给服务器,添加品牌
 const save = async () => {
-    // 没有返回值,如果当前API请求成功,promise的状态就会变成成功,否则就是失败
-    await saveTrademarkApi(form);
+
+    if (form.id) {
+        await updateTrademarkApi(form);
+    } else {
+        // 没有返回值,如果当前API请求成功,promise的状态就会变成成功,否则就是失败
+        await saveTrademarkApi(form);
+    }
 
     // 用来隐藏dialog组件
     dialogFormVisible.value = false;
 
+
+    // console.log('title',title)
     // 弹出提示窗口提示用户
+    // 计算属性的返回值是一个ref对象，想要在js代码中获取他的值，必须加上.value
     ElMessage({
-        message: '添加品牌成功',
+        message: `${title.value}品牌成功`,
         type: 'success',
     })
 
@@ -188,7 +196,7 @@ const save = async () => {
     // Object.assign(target,source)
     // 当前API可以将后续来源对象的所有属性名和属性值都给目标对象target复制一份,
     // 如果出现同名就以后者为准,也就是覆盖
-    Object.assign(form,data);
+    Object.assign(form, data);
 
     // 在发送请求之前,先讲currentPage修改为1,回到第一页,防止出现逻辑BUG
     currentPage.value = 1;
@@ -197,10 +205,56 @@ const save = async () => {
     getTrademarkPageList();
 }
 
-const cancel = ()=>{
+// 用户点击dialog取消按钮逻辑
+const cancel = () => {
     dialogFormVisible.value = false;
-    Object.assign(form,initData());
+    Object.assign(form, initData());
 }
+
+// 当用户点击某个编辑按钮的时候,实现品牌数据修改操作
+const handleEdit = (row: TrademarkModel) => {
+    // console.log('handleEdit',row)
+    dialogFormVisible.value = true;
+
+    // 将当前行的对象数据复制一份给form对象,用于dialog展示
+    Object.assign(form, row);
+}
+
+const handleDelete = (row: TrademarkModel) => {
+    ElMessageBox.confirm(
+        `你确定要删除${row.tmName}吗?`,
+        '提示',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    )
+        .then(async () => {
+            // 用户如果点击了确定,就会进行该回调函数
+
+            await deleteTrademarkApi(row.id as number);
+            ElMessage({
+                type: 'success',
+                message: '已删除该品牌',
+            });
+
+            // 如果当前页面展示的数据条数大于1,就重新请求当前页面的数据,否则请求上一页
+            currentPage.value = tableData.value.length > 1 ? currentPage.value : currentPage.value - 1;
+            getTrademarkPageList();
+        })
+        .catch(() => {
+            // 用户如果点击了取消,就会进行该回调函数
+            ElMessage({
+                type: 'info',
+                message: '已取消删除',
+            })
+        })
+}
+
+const title = computed(() => {
+    return form.id ? '修改' : '添加';
+})
 
 onMounted(() => {
     getTrademarkPageList();
