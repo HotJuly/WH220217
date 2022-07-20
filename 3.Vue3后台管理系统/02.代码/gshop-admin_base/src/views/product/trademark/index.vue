@@ -37,12 +37,12 @@
             注意点:
                 el-form组件上必须具有model属性,属性值是用来收集存储数据的对象
          -->
-        <el-dialog v-model="dialogFormVisible" :title="`${title}品牌`">
-            <el-form :model="form">
-                <el-form-item label="品牌名称" label-width="100px">
+        <el-dialog v-model="dialogFormVisible" :title="`${title}品牌`" @closed="cancel">
+            <el-form ref="formRef" :model="form" :rules="rules">
+                <el-form-item prop="tmName" label="品牌名称" label-width="100px">
                     <el-input v-model="form.tmName" autocomplete="off" />
                 </el-form-item>
-                <el-form-item label="品牌LOGO" label-width="100px">
+                <el-form-item prop="logoUrl" label="品牌LOGO" label-width="100px">
                     <el-upload class="avatar-uploader" :action="`${BASE_URL}/admin/product/fileUpload`"
                         :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                         <img v-if="form.logoUrl" :src="form.logoUrl" class="avatar" />
@@ -70,13 +70,14 @@ export default {
 
 <script setup lang="ts">
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import type { TrademarkListModel, TrademarkModel } from '@/api/product/model/TrademarkModel'
+import type { FormInstance, FormRules, UploadProps } from 'element-plus'
+
 
 import { getTrademarkPageListApi, saveTrademarkApi, updateTrademarkApi, deleteTrademarkApi } from '@/api/product/trademark'
-import type { UploadProps } from 'element-plus'
 
 // 通过以下代码可以获取到当前运行环境中的部分环境变量,例如VITE_API_URL
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -105,9 +106,51 @@ const initData = () => ({
     tmName: "",
     logoUrl: ""
 });
-const form = reactive<TrademarkModel>(initData())
+const form = reactive<TrademarkModel>(initData());
 
-const imageUrl = ref('')
+// 通过ref对象配合标签属性ref,可以找到对应form组件的实例对象
+const formRef = ref<FormInstance>();
+
+const validateTmName = (rule: any, value: any, callback: any) => {
+    // rule是当前进行自定义校验的相关数据
+    // value是当前收集到的数据,也就是即将用于校验的内容
+    // callback是一个函数,该函数如果直接调用,不传入参数,说明校验成功
+    //  如果调用时候,将创建的这个报错对象传入callback,就代表校验失败
+    // console.log(rule, value, callback)
+
+    if (value.length < 2 || value.length > 6) {
+        // 能进入到这里说明当前校验失败
+        callback(new Error('品牌名称长度必须在2-6个字符之间'))
+        return false;
+    } else {
+        callback();
+        return true;
+    }
+}
+// rules中对象的属性名必须跟form中的对应
+// 属性值为数组,数组中存储多个对象,每个对象就是一条校验规则
+// trigger数值:blur代表失去焦点触发,change代表内容发生修改时触发
+
+/*
+    表单校验一共分为三种
+        1.普通校验(使用预设好的规则进行校验)
+        2.自定义校验(可以通过validator属性,传入函数来实现自定义规则的效果)
+        3.统一校验
+
+    统一校验的API是validate
+    清空校验结果的API是clearValidate,该函数如果不传实参,就是清空所有的校验结果
+
+*/
+const rules = reactive<FormRules>({
+    tmName: [
+        { required: true, message: '请输入品牌名称', trigger: 'blur' },
+        // { min: 2, max: 6, message: '品牌名称长度必须在2-6个字符之间', trigger: 'change' },
+        { validator: validateTmName, trigger: 'change' }
+    ],
+    logoUrl: [
+        { required: true, message: '请输入品牌名称' }
+    ]
+})
 
 // 用于发送请求获取当前品牌列表数据,并自动更新到对应的响应数据中
 const getTrademarkPageList = async () => {
@@ -167,48 +210,66 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 
 
 // 用于监视用户点击保存按钮,发送请求给服务器,添加品牌
-const save = async () => {
+const save = () => {
 
-    if (form.id) {
-        await updateTrademarkApi(form);
-    } else {
-        // 没有返回值,如果当前API请求成功,promise的状态就会变成成功,否则就是失败
-        await saveTrademarkApi(form);
-    }
+    // 通过validate方法可以强制当前表单所有校验规则都执行一次
+    formRef.value?.validate(async (flag: boolean) => {
+        if (flag) {
+            if (form.id) {
+                await updateTrademarkApi(form);
+            } else {
+                // 没有返回值,如果当前API请求成功,promise的状态就会变成成功,否则就是失败
+                await saveTrademarkApi(form);
+            }
 
-    // 用来隐藏dialog组件
-    dialogFormVisible.value = false;
+            // 用来隐藏dialog组件
+            dialogFormVisible.value = false;
 
 
-    // console.log('title',title)
-    // 弹出提示窗口提示用户
-    // 计算属性的返回值是一个ref对象，想要在js代码中获取他的值，必须加上.value
-    ElMessage({
-        message: `${title.value}品牌成功`,
-        type: 'success',
+            // console.log('title',title)
+            // 弹出提示窗口提示用户
+            // 计算属性的返回值是一个ref对象，想要在js代码中获取他的值，必须加上.value
+            ElMessage({
+                message: `${title.value}品牌成功`,
+                type: 'success',
+            })
+
+            // 清空当前dialog展示的数据
+            // form = initData()
+            const data = initData();
+            // form.tmName = data.tmName;
+
+            // Object.assign(target,source)
+            // 当前API可以将后续来源对象的所有属性名和属性值都给目标对象target复制一份,
+            // 如果出现同名就以后者为准,也就是覆盖
+            Object.assign(form, data);
+
+            nextTick(() => {
+                formRef.value?.clearValidate();
+            })
+
+            // 在发送请求之前,先讲currentPage修改为1,回到第一页,防止出现逻辑BUG
+            currentPage.value = 1;
+
+            // 发送请求,刷新当前的列表
+            getTrademarkPageList();
+        }
     })
 
-    // 清空当前dialog展示的数据
-    // form = initData()
-    const data = initData();
-    // form.tmName = data.tmName;
-
-    // Object.assign(target,source)
-    // 当前API可以将后续来源对象的所有属性名和属性值都给目标对象target复制一份,
-    // 如果出现同名就以后者为准,也就是覆盖
-    Object.assign(form, data);
-
-    // 在发送请求之前,先讲currentPage修改为1,回到第一页,防止出现逻辑BUG
-    currentPage.value = 1;
-
-    // 发送请求,刷新当前的列表
-    getTrademarkPageList();
 }
 
 // 用户点击dialog取消按钮逻辑
 const cancel = () => {
+    // Vue中,对数据的更新有做判断,如果旧数据与新数据相同,那么本次更新失效(页面不会更新)
     dialogFormVisible.value = false;
     Object.assign(form, initData());
+
+    // 清空本轮的校验结果,防止遗留到下一次展示
+    // Vue更新数据是同步更新,页面异步更新
+    // nextTick的回调函数会在最近一个DOM更新结束之后执行
+    nextTick(() => {
+        formRef.value?.clearValidate();
+    })
 }
 
 // 当用户点击某个编辑按钮的时候,实现品牌数据修改操作
