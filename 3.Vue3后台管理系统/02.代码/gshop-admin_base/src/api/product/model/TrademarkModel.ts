@@ -27,7 +27,7 @@
 
 // 声明品牌对象具有哪些属性
 export interface TrademarkModel {
-  id: number;
+  id?: number;
   tmName: string;
   logoUrl: string;
 }
