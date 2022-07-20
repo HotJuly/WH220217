@@ -37,26 +37,33 @@
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { ref, onMounted } from 'vue'
 
+import type { TrademarkListModel } from '@/api/product/model/TrademarkModel'
+
 import { getTrademarkPageListApi } from '@/api/product/trademark'
 
 // 用于控制table组件显示的数据
-const tableData = ref([]);
+
+// 此处为什么选择ref?
+// reactive只能监视对内部属性的修改,不能监视到地址值的修改
+// ref的value属性是一个响应式属性,如果对其重新赋值,那么也具有响应式效果
+const tableData = ref<TrademarkListModel>([]);
 
 // 用于存储当前处于第几页
-const currentPage = ref(1);
+const currentPage = ref<number>(1);
 
 // 用于存储当前页面显示数据条数
-const pageSize = ref(3);
+const pageSize = ref<number>(3);
 
 // 用于存储当前品牌总数量
-const total = ref();
+const total = ref<number>();
 
 // 用于发送请求获取当前品牌列表数据,并自动更新到对应的响应数据中
 const getTrademarkPageList = async () => {
     const result = await getTrademarkPageListApi(currentPage.value, pageSize.value);
-    console.log(result);
+    // console.log(result);
     tableData.value = result.records;
     total.value = result.total;
+    // console.log(result.num66666)
 }
 
 // 该方法会交给分页器组件,用于监视用户修改当前页数操作

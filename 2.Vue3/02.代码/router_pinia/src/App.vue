@@ -24,7 +24,7 @@ export default {
 </script>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 
 const router = useRouter();
 /*
@@ -45,9 +45,11 @@ const router = useRouter();
 
 
 const toAbout = () => {
+  // useRouter方法必须在setup中进行调用,不能放在异步任务中执行,否则会使undefined
+  // const router = useRouter();
   // $router提供操作历史记录栈的方法
   // this.$router.push()
-  // console.log(router);
+  console.log(router);
   router.push("/about")
 }
 

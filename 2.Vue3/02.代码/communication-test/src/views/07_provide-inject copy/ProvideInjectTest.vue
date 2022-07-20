@@ -19,7 +19,7 @@
 </template>
 
 <script  lang="ts" setup>
-  import { provide,reactive } from 'vue';
+  import { provide, reactive } from 'vue';
   import Child from './Child.vue'
 
   const state = reactive({
@@ -29,14 +29,8 @@
     }
   })
 
-  const changeContent1 = (value:string)=>{
-    state.content1 = value;
-  }
-
-  provide("content1111",state.content1);
-  provide("content2222",state.content2);
-
-  provide("updateContent1",changeContent1);
+  provide("content1111",state.content1)
+  provide("content2222",state.content2)
 
 
 </script>

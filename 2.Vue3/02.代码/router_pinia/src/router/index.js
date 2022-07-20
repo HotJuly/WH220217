@@ -23,7 +23,8 @@ import {
 } from "vue-router";
 
 export default createRouter({
-  // history: createWebHashHistory(),
+  // history: createWebHashHistory()=>对应Vue2时期的hash值模式,mode:"hash"
+  // 以下写法相当于Vue2时期中的history,mode:"history"
   history: createWebHistory(),
   routes: [
     {
