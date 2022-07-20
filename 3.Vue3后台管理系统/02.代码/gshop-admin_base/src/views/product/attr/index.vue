@@ -1,10 +1,11 @@
 <template>
     <div>
-        attr
+        <CategorySelector />
     </div>
 </template>
 
 <script setup lang="ts">
+import CategorySelector from '@/components/CategorySelector/index.vue';
 
 </script>
 

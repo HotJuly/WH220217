@@ -103,6 +103,7 @@ const dialogFormVisible = ref(false)
 
 // 用于收集用户输入的表单数据
 const initData = () => ({
+    id:undefined,
     tmName: "",
     logoUrl: ""
 });
@@ -262,6 +263,7 @@ const save = () => {
 const cancel = () => {
     // Vue中,对数据的更新有做判断,如果旧数据与新数据相同,那么本次更新失效(页面不会更新)
     dialogFormVisible.value = false;
+    // form.id=undefined;
     Object.assign(form, initData());
 
     // 清空本轮的校验结果,防止遗留到下一次展示
