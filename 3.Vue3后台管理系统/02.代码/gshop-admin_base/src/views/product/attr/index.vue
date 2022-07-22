@@ -33,7 +33,7 @@
                 <el-table-column prop="attrName" label="属性名称" width="150" />
                 <el-table-column label="属性值列表">
                     <template #default="{ row }">
-                        <el-tag type="success" style="margin-right:10px" v-for="attrValue in row.attrValueList"
+                        <el-tag type="success" style="margin-right:5px" v-for="attrValue in row.attrValueList"
                             :key="attrValue.id">{{ attrValue.valueName }}</el-tag>
                     </template>
                 </el-table-column>
@@ -52,7 +52,7 @@
                 </el-form-item>
                 <el-form-item label-width="0">
                     <el-button type="primary" :icon="Plus" @click="addAttrValue">添加属性值</el-button>
-                    <el-button>取消</el-button>
+                    <el-button  @click="cancel">取消</el-button>
                 </el-form-item>
                 <el-form-item>
                     <el-table :data="attrForm.attrValueList" style="width: 100%">
@@ -62,12 +62,16 @@
                                 <el-input v-model="row.valueName" placeholder="请输入属性值名称"></el-input>
                             </template>
                         </el-table-column>
-                        <el-table-column label="操作" />
+                        <el-table-column label="操作">
+                            <template #default="{row,$index}">
+                                <el-button type="danger" :icon="Delete" @click="deleteAttrValue($index)"></el-button>
+                            </template>
+                        </el-table-column>
                     </el-table>
                 </el-form-item>
                 <el-form-item label-width="0">
-                    <el-button type="primary">保存</el-button>
-                    <el-button>取消</el-button>
+                    <el-button type="primary" @click="save">保存</el-button>
+                    <el-button @click="cancel">取消</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
@@ -89,10 +93,12 @@ import { useCategoryStore } from '@/stores/category';
 import { getAttrInfoListApi } from '@/api/product/attr';
 import { ElMessage } from 'element-plus';
 
+import type { AttrListModel, AttrModel } from '@/api/product/model/attrModel';
+
 const categoryStore = useCategoryStore();
 
 // 用于存储当前页面的属性列表
-const attrList = ref([]);
+const attrList = ref<AttrListModel>([]);
 
 // 用于控制table表格loading效果
 const loading = ref<boolean>(false);
@@ -101,22 +107,24 @@ const loading = ref<boolean>(false);
 const isShowAdd = ref<boolean>(true);
 
 // 用于收集当前添加属性模块用户输入的数据,最终作为请求体发送给服务器
-const attrForm = reactive({
+const attrForm = reactive<AttrModel>({
     // 当前属性名称
-    attrName: "",   
+    attrName: "",
     // 当前属性值的列表
     attrValueList: [
         // {
-        //      当前属性值属于哪个属性,就填写对应的属性id,新增肯定没有
+        //   当前属性值属于哪个属性,就填写对应的属性id,新增肯定没有
         //     "attrId": 0,
-        //      id一定是当前这个属性值的唯一标识,新增肯定没有,修改可能有
+        //   id一定是当前这个属性值的唯一标识,新增肯定没有,修改可能有
         //     "id": 0,
-        //      该属性是当前属性值的内容,肯定有,需要是用户自己输入,要么是修改自带
+        //   该属性是当前属性值的内容,肯定有,需要是用户自己输入,要么是修改自带
         //     "valueName": "string"
         // }
     ],
+
     // 当前三级分类的id
     categoryId: undefined,
+
     // 当前分类的等级,直接写死为3
     categoryLevel: 3,
 
@@ -147,6 +155,20 @@ const addAttrValue = ()=>{
     attrForm.attrValueList.push({
         valueName:""
     })
+}
+
+// 监视用户点击删除属性值按钮
+const deleteAttrValue = (index:number)=>{
+    attrForm.attrValueList.splice(index,1);
+}
+
+// 
+const save = ()=>{
+    isShowAdd.value = true;
+}
+
+const cancel = ()=>{
+    isShowAdd.value = true;
 }
 
 // console.log('categoryStore',categoryStore.category3Id)
