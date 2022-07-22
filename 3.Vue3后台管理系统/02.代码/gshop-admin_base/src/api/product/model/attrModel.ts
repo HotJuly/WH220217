@@ -24,6 +24,9 @@ export interface AttrValueModel {
     id?: number;
     valueName: string;
     attrId?: number;
+
+    // 用于控制编辑模式的切换
+    isEdit?:boolean;
 }
 
 export type AttrValueListModel = AttrValueModel[];

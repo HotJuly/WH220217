@@ -38,8 +38,8 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="150">
-                    <template #default>
-                        <el-button type="primary" :icon="Edit"></el-button>
+                    <template #default="{row}">
+                        <el-button type="primary" :icon="Edit" @click="updateAttr(row)"></el-button>
                         <el-button type="danger" :icon="Delete"></el-button>
                     </template>
                 </el-table-column>
@@ -58,8 +58,9 @@
                     <el-table :data="attrForm.attrValueList" style="width: 100%">
                         <el-table-column type="index" label="序号" width="80" />
                         <el-table-column prop="valueName" label="属性值名称">
-                            <template #default="{row}">
-                                <el-input v-model="row.valueName" placeholder="请输入属性值名称"></el-input>
+                            <template #default="{row,$index}">
+                                <el-input ref="inputRef" v-if="row.isEdit" @blur="toLook(row,$index)" v-model="row.valueName" placeholder="请输入属性值名称"></el-input>
+                                <span v-else @click="toEdit(row)">{{row.valueName}}</span>
                             </template>
                         </el-table-column>
                         <el-table-column label="操作">
@@ -85,15 +86,17 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, nextTick } from 'vue';
 import CategorySelector from '@/components/CategorySelector/index.vue';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
 
 import { useCategoryStore } from '@/stores/category';
 import { getAttrInfoListApi } from '@/api/product/attr';
 import { ElMessage } from 'element-plus';
+import { cloneDeep } from 'lodash';
 
-import type { AttrListModel, AttrModel } from '@/api/product/model/attrModel';
+import type { InputInstance } from 'element-plus';
+import type { AttrListModel, AttrModel, AttrValueModel } from '@/api/product/model/attrModel';
 
 const categoryStore = useCategoryStore();
 
@@ -132,6 +135,9 @@ const attrForm = reactive<AttrModel>({
     id: undefined
 });
 
+// 用于找到页面上的input框,方便后续使其获取焦点
+const inputRef = ref<InputInstance>();
+
 // 调用该方法可以获取到当前最新的属性列表
 const getAttrList = async () => {
 
@@ -153,6 +159,8 @@ const getAttrList = async () => {
 // 监视用户点击添加属性值操作
 const addAttrValue = ()=>{
     attrForm.attrValueList.push({
+        // 其实如果是指做新增功能,不需要添加该属性,但是修改操作和添加很相似,所以这里做一个兼容性处理
+        attrId:attrForm.id,
         valueName:""
     })
 }
@@ -169,6 +177,40 @@ const save = ()=>{
 
 const cancel = ()=>{
     isShowAdd.value = true;
+}
+
+// 监视用户点击修改属性按钮
+const updateAttr = (row:AttrModel)=>{
+    isShowAdd.value = false;
+
+    // 由于row对象中的attrValueList数据类型是数组,如果不实现深拷贝,就会影响到列表数据的展示
+    Object.assign(attrForm,cloneDeep(row));
+}
+
+// 监视用户span被点击事件,切换到input框实现编辑模式,收集用户输入数据
+const toEdit = (row:AttrValueModel)=>{
+    // 将isEdit属性变为true,可以导致页面显示出对应的input框
+    // this.$set和Vue.set
+    row.isEdit = true;
+
+    // 找到页面上最新的input框,让其获得焦点,防止用户不会触发失去焦点事件
+    // BUG:由于isEdit属性更新是同步操作,但是视图更新是异步更新,会导致先执行获取焦点的代码,才会显示出input框,所以会获取焦点失败
+    // 解决:将获取焦点的代码,放到input框更新出来之后,再执行,就能解决
+    nextTick(()=>{
+        inputRef.value?.focus();
+    })
+    // debugger
+}
+
+// 监视用户输入框失去焦点事件,切回span标签进行展示效果
+const toLook = (row:AttrValueModel,index:number)=>{
+    if(!row.valueName.trim()){
+        attrForm.attrValueList.splice(index,1);
+        ElMessage.info("属性值不能为空!")
+        // return;
+    }
+    
+    row.isEdit = false;
 }
 
 // console.log('categoryStore',categoryStore.category3Id)
