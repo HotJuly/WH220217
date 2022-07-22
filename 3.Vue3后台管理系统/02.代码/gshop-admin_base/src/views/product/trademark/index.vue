@@ -121,11 +121,15 @@ const validateTmName = (rule: any, value: any, callback: any) => {
 
     if (value.length < 2 || value.length > 6) {
         // 能进入到这里说明当前校验失败
-        callback(new Error('品牌名称长度必须在2-6个字符之间'))
-        return false;
+        // callback(new Error('品牌名称长度必须在2-6个字符之间'))
+        // return false;
+        
+        return callback(new Error('品牌名称长度必须在2-6个字符之间'));
     } else {
-        callback();
-        return true;
+        // return true;
+        // callback();
+
+        return callback();
     }
 }
 // rules中对象的属性名必须跟form中的对应
@@ -280,7 +284,17 @@ const handleEdit = (row: TrademarkModel) => {
     dialogFormVisible.value = true;
 
     // 将当前行的对象数据复制一份给form对象,用于dialog展示
-    Object.assign(form, row);
+    // Object.assign方法的效果其实是浅拷贝的
+    /*
+        问题:什么是浅拷贝?什么是深拷贝?
+        回答:
+            前言:基本数据类型,不存在深拷贝还是浅拷贝的问题
+            高逼格:在拷贝一个对象中的内容时候,如果堆内存中有开辟全新的空间,那么就成为深拷贝,反之浅拷贝
+            正常:如果一个对象中的属性值又是对象数据类型,此时
+                如果创建的新对象中,对应的属性值是内部对象的地址值,这种称为浅拷贝
+                如果创建的新对象中,对应的属性值是是根据内部对象的结构创建的全新对象,这种称为深拷贝
+    */
+    Object.assign(form, row)
 }
 
 const handleDelete = (row: TrademarkModel) => {
