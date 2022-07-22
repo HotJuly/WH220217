@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-// import type { TrademarkPageListModel, TrademarkModel } from './model/TrademarkModel'
+import type { CategoryListModel } from './model/categoryModel'
 
 enum Api{
     getCategory1List = "/admin/product/getCategory1",
@@ -9,15 +9,15 @@ enum Api{
 
 // 用于请求一级分类列表数据
 export const getCategory1ListApi = ()=>{
-    return request.get<any,any>(Api.getCategory1List)
+    return request.get<any,CategoryListModel>(Api.getCategory1List)
 }
 
 // 用于请求二级分类列表数据
 export const getCategory2ListApi = (category1Id:number)=>{
-    return request.get<any,any>(`${Api.getCategory2List}/${category1Id}`)
+    return request.get<any,CategoryListModel>(`${Api.getCategory2List}/${category1Id}`)
 }
 
 // 用于请求三级分类列表数据
 export const getCategory3ListApi = (category2Id:number)=>{
-    return request.get<any,any>(`${Api.getCategory3List}/${category2Id}`)
+    return request.get<any,CategoryListModel>(`${Api.getCategory3List}/${category2Id}`)
 }

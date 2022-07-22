@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { getCategory1ListApi,getCategory2ListApi,getCategory3ListApi } from '@/api/product/category';
+import type { CategoryStateModel } from '@/api/product/model/categoryModel';
 
 export const useCategoryStore = defineStore("category",{
-    state:()=>{
+    state:():CategoryStateModel=>{
         return {
             // 以下三个属性用于收集用户真正选择的分类id
             category1Id:undefined,
@@ -18,7 +19,6 @@ export const useCategoryStore = defineStore("category",{
     actions:{
         async getCategory1List(){
             const result = await getCategory1ListApi();
-            // console.log('onMounted',result)
 
             this.category1List = result;
         },
