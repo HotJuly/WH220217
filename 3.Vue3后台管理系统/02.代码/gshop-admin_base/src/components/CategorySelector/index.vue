@@ -54,6 +54,7 @@ const category1Id = computed({
         categoryStore.getCategory2List(id);
     }
 })
+
 const category2Id = computed({
     get() {
         return categoryStore.category2Id

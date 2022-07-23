@@ -27,7 +27,8 @@
 
         <!-- 给组件标签添加的class和style都会被该组件的根节点继承 -->
         <el-card v-if="isShowAdd" style="margin-top:20px">
-            <el-button type="primary" :icon="Plus" @click="isShowAdd = false">添加属性</el-button>
+            <el-button type="primary" :icon="Plus" :disabled="!categoryStore.category3Id" @click="isShowAdd = false">
+                添加属性</el-button>
             <el-table v-loading="loading" :data="attrList" border style="width: 100%;margin-top:10px">
                 <el-table-column type="index" label="序号" align="center" width="80" />
                 <el-table-column prop="attrName" label="属性名称" width="150" />
@@ -38,7 +39,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="150">
-                    <template #default="{row}">
+                    <template #default="{ row }">
                         <el-button type="primary" :icon="Edit" @click="updateAttr(row)"></el-button>
                         <el-button type="danger" :icon="Delete"></el-button>
                     </template>
@@ -51,27 +52,29 @@
                     <el-input v-model="attrForm.attrName" style="width:200px" placeholder="请输入属性名"></el-input>
                 </el-form-item>
                 <el-form-item label-width="0">
-                    <el-button type="primary" :icon="Plus" @click="addAttrValue">添加属性值</el-button>
-                    <el-button  @click="cancel">取消</el-button>
+                    <el-button type="primary" :icon="Plus" :disabled="!attrForm.attrName" @click="addAttrValue">添加属性值
+                    </el-button>
+                    <el-button @click="cancel">取消</el-button>
                 </el-form-item>
                 <el-form-item>
                     <el-table :data="attrForm.attrValueList" style="width: 100%">
                         <el-table-column type="index" label="序号" width="80" />
                         <el-table-column prop="valueName" label="属性值名称">
-                            <template #default="{row,$index}">
-                                <el-input ref="inputRef" v-if="row.isEdit" @blur="toLook(row,$index)" v-model="row.valueName" placeholder="请输入属性值名称"></el-input>
-                                <span v-else @click="toEdit(row)">{{row.valueName}}</span>
+                            <template #default="{ row, $index }">
+                                <el-input ref="inputRef" v-if="row.isEdit" @blur="toLook(row, $index)"
+                                    v-model="row.valueName" placeholder="请输入属性值名称"></el-input>
+                                <span v-else @click="toEdit(row)">{{ row.valueName }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column label="操作">
-                            <template #default="{row,$index}">
+                            <template #default="{ row, $index }">
                                 <el-button type="danger" :icon="Delete" @click="deleteAttrValue($index)"></el-button>
                             </template>
                         </el-table-column>
                     </el-table>
                 </el-form-item>
                 <el-form-item label-width="0">
-                    <el-button type="primary" @click="save">保存</el-button>
+                    <el-button type="primary" @click="save" :disabled="isSaveDisabled">保存</el-button>
                     <el-button @click="cancel">取消</el-button>
                 </el-form-item>
             </el-form>
@@ -81,12 +84,12 @@
 
 <script lang="ts">
 export default {
-    name:"Attr"
+    name: "Attr"
 }
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick } from 'vue';
+import { ref, reactive, watch, computed, nextTick } from 'vue';
 import CategorySelector from '@/components/CategorySelector/index.vue';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
 
@@ -110,10 +113,11 @@ const loading = ref<boolean>(false);
 const isShowAdd = ref<boolean>(true);
 
 // 用于收集当前添加属性模块用户输入的数据,最终作为请求体发送给服务器
-const attrForm = reactive<AttrModel>({
-    // 当前属性名称
+const initData = () => ({
+    // 当前属性名称,新增修改都必传
     attrName: "",
-    // 当前属性值的列表
+
+    // 当前属性值的列表,新增修改都必须有,不能为空
     attrValueList: [
         // {
         //   当前属性值属于哪个属性,就填写对应的属性id,新增肯定没有
@@ -125,7 +129,7 @@ const attrForm = reactive<AttrModel>({
         // }
     ],
 
-    // 当前三级分类的id
+    // 当前三级分类的id,无论新增还是修改都必传
     categoryId: undefined,
 
     // 当前分类的等级,直接写死为3
@@ -133,7 +137,8 @@ const attrForm = reactive<AttrModel>({
 
     // 当前属性的唯一标识,但是新增没有,修改肯定有
     id: undefined
-});
+})
+const attrForm = reactive<AttrModel>(initData());
 
 // 用于找到页面上的input框,方便后续使其获取焦点
 const inputRef = ref<InputInstance>();
@@ -157,38 +162,79 @@ const getAttrList = async () => {
 }
 
 // 监视用户点击添加属性值操作
-const addAttrValue = ()=>{
+const addAttrValue = () => {
+    // 扩展:Vue更新数据是同步更新,更新视图是异步更新
+    // 宏任务->setTimeout,ajax,事件
+    // 微任务->.then
+    // Vue更新视图是微任务,nextTick方法也是微任务
+    // 什么是队列?
+    // 实现的数据类型是数组
+    /*
+        数据模型:
+            栈结构
+                栈结构是先进后出,后进先出
+            队列结构
+                队列结构是先进先出,后进后出
+        
+        宏任务队列和微任务队列
+            主线程代码->清空微任务队列->执行宏任务
+    */
+
+    //    setTimeout是开启宏任务的方法,内部的回调函数才是宏任务
+    //     setTimeout(() => {
+    //         console.log(1);
+    //     }, 100)
+
+    // //    then是开启微任务的方法,内部的回调函数才是微任务
+    //     Promise.resolve().then(() => {
+    //         console.log(2)
+    //     })
+
+    //     setTimeout(() => {
+    //         console.log(3);
+    //     }, 0)
+
+    //     console.log(4)
+
     attrForm.attrValueList.push({
         // 其实如果是指做新增功能,不需要添加该属性,但是修改操作和添加很相似,所以这里做一个兼容性处理
-        attrId:attrForm.id,
-        valueName:""
+        attrId: attrForm.id,
+        valueName: "",
+        isEdit: true
+    })
+
+    nextTick(() => {
+        // 在这里才能拿到最新的真实DOM
+        inputRef.value?.focus();
     })
 }
 
 // 监视用户点击删除属性值按钮
-const deleteAttrValue = (index:number)=>{
-    attrForm.attrValueList.splice(index,1);
+const deleteAttrValue = (index: number) => {
+    attrForm.attrValueList.splice(index, 1);
 }
 
 // 
-const save = ()=>{
+const save = () => {
     isShowAdd.value = true;
+    // Object.assign(attrForm,initData());
 }
 
-const cancel = ()=>{
+const cancel = () => {
     isShowAdd.value = true;
+    // Object.assign(attrForm,initData());
 }
 
 // 监视用户点击修改属性按钮
-const updateAttr = (row:AttrModel)=>{
+const updateAttr = (row: AttrModel) => {
     isShowAdd.value = false;
 
     // 由于row对象中的attrValueList数据类型是数组,如果不实现深拷贝,就会影响到列表数据的展示
-    Object.assign(attrForm,cloneDeep(row));
+    Object.assign(attrForm, cloneDeep(row));
 }
 
 // 监视用户span被点击事件,切换到input框实现编辑模式,收集用户输入数据
-const toEdit = (row:AttrValueModel)=>{
+const toEdit = (row: AttrValueModel) => {
     // 将isEdit属性变为true,可以导致页面显示出对应的input框
     // this.$set和Vue.set
     row.isEdit = true;
@@ -196,20 +242,41 @@ const toEdit = (row:AttrValueModel)=>{
     // 找到页面上最新的input框,让其获得焦点,防止用户不会触发失去焦点事件
     // BUG:由于isEdit属性更新是同步操作,但是视图更新是异步更新,会导致先执行获取焦点的代码,才会显示出input框,所以会获取焦点失败
     // 解决:将获取焦点的代码,放到input框更新出来之后,再执行,就能解决
-    nextTick(()=>{
+    nextTick(() => {
         inputRef.value?.focus();
     })
     // debugger
 }
 
 // 监视用户输入框失去焦点事件,切回span标签进行展示效果
-const toLook = (row:AttrValueModel,index:number)=>{
-    if(!row.valueName.trim()){
-        attrForm.attrValueList.splice(index,1);
+const toLook = (row: AttrValueModel, index: number) => {
+    // 如果没有数据,或者都是空格,就删除该条记录
+    if (!row.valueName.trim()) {
+        attrForm.attrValueList.splice(index, 1);
         ElMessage.info("属性值不能为空!")
-        // return;
+        return;
     }
-    
+
+    // 如果有数据,但是数据已经重复,也删除该条记录
+    // 用于当前输入的数据在row.valueName中存储,所有的属性值都在attrForm.attrValueList数组中
+    // attrForm.attrValueList是数组,内部存储是对象
+    // row.valueName是字符串
+    // 其实最终要的效果,是取出内部对象的valueName和row.valueName进行对比,判断是否出现过
+    // filter,find,every,some都可以,但是我们需要的返回值是布尔值类型,所以排除filter,find
+    // 又因为只找一个就够,所以some即可
+    const result = attrForm.attrValueList.some((item, i) => {
+        // 1.先判断是不是同一个人,如果是同一个人就不执行后续代码
+        // 2.如果不是同一个人才判断名字
+        return i !== index && item.valueName === row.valueName;
+    })
+
+    // 如果result值为true代表该属性已存在,需要删除
+    if (result) {
+        attrForm.attrValueList.splice(index, 1);
+        ElMessage.info("属性值不能重复!")
+        return;
+    }
+
     row.isEdit = false;
 }
 
@@ -224,6 +291,44 @@ watch(() => categoryStore.category3Id, (id: number | undefined) => {
     getAttrList();
 }, {
     immediate: true
+})
+
+
+// 通过watch监视页面的切换展示效果,达到我们预期的效果,就清空表单数据
+watch(isShowAdd,(newValue)=>{
+    // newValue如果为true,代表即将显示列表页,需要清空数据
+    // newValue如果为false,标签即将显示添加页面,不需要清空
+    if(newValue){
+        Object.assign(attrForm,initData());
+    }
+})
+
+
+// 根据添加属性模块的属性名和属性值列表,来判断,保存按钮是否可以使用
+// 返回值类型:布尔值
+//  true->禁用,false->允许使用
+const isSaveDisabled = computed(() => {
+    // 获取到需要判断的数据
+    const { attrName, attrValueList } = attrForm;
+
+    const hasName = !!attrName;
+    // const hasName = Boolean(attrName);
+
+    // length属性的取值范围0-无限大,其中只有0是false值
+    // 出现了问题:用户点击添加属性值之后,会立即插入一条记录到该数组中,所以长度不会为0
+    // const hasValue = attrValueList.length;
+
+    // every如果遇到数组长度为0,返回值为true
+    const hasValue = attrValueList.length && attrValueList.every((item) => {
+        return item.valueName
+    })
+
+    // some如果遇到数组长度为0,返回值为false
+    // const hasValue = attrValueList.some((item)=>{
+    //     return !item.valueName
+    // })
+
+    return !(hasName && hasValue)
 })
 
 </script>
