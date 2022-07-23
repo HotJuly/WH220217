@@ -1,6 +1,6 @@
 <template>
     <div>
-        <CategorySelector />
+        <CategorySelector :disabled="!isShowAdd" />
 
         <!-- 
             问题:v-if与v-show的区别
@@ -40,8 +40,12 @@
                 </el-table-column>
                 <el-table-column label="操作" width="150">
                     <template #default="{ row }">
-                        <el-button type="primary" :icon="Edit" @click="updateAttr(row)"></el-button>
-                        <el-button type="danger" :icon="Delete"></el-button>
+                        <el-button type="primary" size="small" :icon="Edit" @click="updateAttr(row)"></el-button>
+                        <el-popconfirm :title="`确定删除${row.attrName}吗?`" @confirm="deleteAttr(row.id)">
+                            <template #reference>
+                                <el-button size="small" type="danger" :icon="Delete"></el-button>
+                            </template>
+                        </el-popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
@@ -94,7 +98,7 @@ import CategorySelector from '@/components/CategorySelector/index.vue';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
 
 import { useCategoryStore } from '@/stores/category';
-import { getAttrInfoListApi } from '@/api/product/attr';
+import { getAttrInfoListApi, saveAttrInfoApi, deleteAttrInfoApi } from '@/api/product/attr';
 import { ElMessage } from 'element-plus';
 import { cloneDeep } from 'lodash';
 
@@ -215,9 +219,45 @@ const deleteAttrValue = (index: number) => {
 }
 
 // 
-const save = () => {
+const save = async () => {
     isShowAdd.value = true;
     // Object.assign(attrForm,initData());
+
+    /*
+        发请求的流程:
+            1.收集数据
+            2.处理数据结构(带上表单校验)
+            3.发送请求
+            4.成功之后做什么
+            5.失败之后做什么
+    */
+
+    //    1.收集数据(已经收集到当前模块的attrForm对象中了)
+    // 补齐当前属性所属的分类id,必传
+    attrForm.categoryId = categoryStore.category3Id;
+
+    //    2.处理数据结构(带上表单校验)
+    /*
+        1.数据来源:attrForm.attrValueList,数据类型是数组
+        2.需求:将内部每个对象的isEdit属性删除
+        3.返回值:map(需要新数组),forEach(不需要新数组)
+    */
+
+    attrForm.attrValueList.forEach((attrValue) => {
+        delete attrValue.isEdit;
+    })
+
+    //  3.发送请求
+    // attr模块比较特殊,新增和修改只有一个接口,也就是说后端那边会考虑是新增还是修改
+    try {
+        // 4.成功做什么
+        await saveAttrInfoApi(attrForm);
+        ElMessage.success('保存属性成功');
+        getAttrList();
+    } catch (e) {
+        // 5.失败做什么
+        ElMessage.error('保存属性失败' + e);
+    }
 }
 
 const cancel = () => {
@@ -231,6 +271,13 @@ const updateAttr = (row: AttrModel) => {
 
     // 由于row对象中的attrValueList数据类型是数组,如果不实现深拷贝,就会影响到列表数据的展示
     Object.assign(attrForm, cloneDeep(row));
+}
+
+// 监视用户点击确定删除属性按钮
+const deleteAttr = async (id:number) => {
+    await deleteAttrInfoApi(id);
+    ElMessage.success("删除属性成功");
+    getAttrList();
 }
 
 // 监视用户span被点击事件,切换到input框实现编辑模式,收集用户输入数据
@@ -295,11 +342,11 @@ watch(() => categoryStore.category3Id, (id: number | undefined) => {
 
 
 // 通过watch监视页面的切换展示效果,达到我们预期的效果,就清空表单数据
-watch(isShowAdd,(newValue)=>{
+watch(isShowAdd, (newValue) => {
     // newValue如果为true,代表即将显示列表页,需要清空数据
     // newValue如果为false,标签即将显示添加页面,不需要清空
-    if(newValue){
-        Object.assign(attrForm,initData());
+    if (newValue) {
+        Object.assign(attrForm, initData());
     }
 })
 
@@ -324,6 +371,7 @@ const isSaveDisabled = computed(() => {
     })
 
     // some如果遇到数组长度为0,返回值为false
+    // some只要数组有一个满足条件就行
     // const hasValue = attrValueList.some((item)=>{
     //     return !item.valueName
     // })

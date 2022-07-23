@@ -1,6 +1,6 @@
 <template>
     <el-card>
-        <el-form :inline="true">
+        <el-form :inline="true" :disabled="disabled">
             <el-form-item label="一级分类">
                 <el-select v-model="category1Id" placeholder="请选择">
                     <el-option v-for="category1 in categoryStore.category1List" 
@@ -42,6 +42,11 @@ export default {
 import { onMounted, computed } from 'vue'
 import { useCategoryStore } from '@/stores/category';
 
+interface Props{
+    disabled:boolean
+}
+
+const props = defineProps<Props>();
 
 const categoryStore = useCategoryStore();
 // console.log(store.category1Id)
