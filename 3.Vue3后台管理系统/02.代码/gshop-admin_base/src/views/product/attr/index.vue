@@ -41,11 +41,18 @@
                 <el-table-column label="操作" width="150">
                     <template #default="{ row }">
                         <el-button type="primary" size="small" :icon="Edit" @click="updateAttr(row)"></el-button>
-                        <el-popconfirm :title="`确定删除${row.attrName}吗?`" @confirm="deleteAttr(row.id)">
+                        <!-- <el-popconfirm :title="`确定删除${row.attrName}吗?`" @confirm="deleteAttr(row.id)">
                             <template #reference>
                                 <el-button size="small" type="danger" :icon="Delete"></el-button>
                             </template>
-                        </el-popconfirm>
+                        </el-popconfirm> -->
+                        <HintButton 
+                            :title="`确定删除${row.attrName}吗?`" 
+                            size="small" 
+                            type="danger" 
+                            :icon="Delete"  
+                            @confirm="deleteAttr(row.id)"
+                        />
                     </template>
                 </el-table-column>
             </el-table>
@@ -104,6 +111,7 @@ import { cloneDeep } from 'lodash';
 
 import type { InputInstance } from 'element-plus';
 import type { AttrListModel, AttrModel, AttrValueModel } from '@/api/product/model/attrModel';
+import HintButton from '@/components/HintButton/index.vue';
 
 const categoryStore = useCategoryStore();
 
