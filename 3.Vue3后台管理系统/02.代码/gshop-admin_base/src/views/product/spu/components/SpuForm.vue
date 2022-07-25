@@ -1,11 +1,11 @@
 <template>
     <el-form label-width="120px">
         <el-form-item label="SPU名称">
-            <el-input v-model="a" placeholder="请输入SPU名称" />
+            <el-input v-model="spuForm.spuName" placeholder="请输入SPU名称" />
         </el-form-item>
 
         <el-form-item label="品牌">
-            <el-select v-model="b" placeholder="请选择品牌">
+            <el-select v-model="spuForm.tmId" placeholder="请选择品牌">
                 <el-option label="苹果" value="1">
                 </el-option>
                 <el-option label="华为" value="2">
@@ -14,7 +14,7 @@
         </el-form-item>
 
         <el-form-item label="SPU描述">
-            <el-input v-model="c" rows="4" type="textarea" placeholder="请输入详细描述" />
+            <el-input v-model="spuForm.description" rows="4" type="textarea" placeholder="请输入详细描述" />
         </el-form-item>
 
         <el-form-item label="SPU图片">
@@ -81,17 +81,28 @@ export default {
 
 <script setup lang="ts">
 
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
+import { cloneDeep } from 'lodash'
 
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import { ShowStatus } from '../types';
+import type { SpuModel } from '@/api/product/model/spuModel';
 
 interface Emits{
     (event:"changeShowStatus",value:ShowStatus):void
 }
 
 const emits = defineEmits<Emits>();
+
+interface Props{
+    currentSpu:SpuModel
+}
+
+const props = defineProps<Props>();
+
+// 该对象用于收集所有的表单数据,后续用于发送请求
+const spuForm = reactive(cloneDeep(props.currentSpu))
 
 const fileList = ref<UploadUserFile[]>([
   {

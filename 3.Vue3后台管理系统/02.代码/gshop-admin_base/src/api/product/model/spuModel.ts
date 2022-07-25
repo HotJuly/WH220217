@@ -40,15 +40,69 @@ export interface SpuPageListModel {
   records: SpuListModel;
 }
 
-export type SpuListModel = SpuModel[]
+export type SpuListModel = SpuModel[];
 
 export interface SpuModel {
   id?: number;
   spuName: string;
   description: string;
-  category3Id: number;
-//   所属品牌id,必有
-  tmId: number|undefined;
+  category3Id: number | undefined;
+  //   所属品牌id,必有
+  tmId: number | undefined;
   spuSaleAttrList: null;
   spuImageList: null;
+}
+
+export type BaseSaleAttrListModel = BaseSaleAttrModel[];
+
+export interface BaseSaleAttrModel {
+  id: number;
+  name: string;
+}
+
+export type SpuImageListModel = SpuImageModel[];
+
+export interface SpuImageModel {
+  id: number;
+  spuId: number;
+  imgName: string;
+  imgUrl: string;
+}
+
+// {
+// "id": 2,
+// "spuId": 1,
+// "baseSaleAttrId": 2,
+// "saleAttrName": "版本",
+// "spuSaleAttrValueList": [
+//     {
+//       "id": 3,
+//       "spuId": 1,
+//       "baseSaleAttrId": 2,
+//       "saleAttrValueName": "8G+128G",
+//       "saleAttrName": "版本",
+//       "isChecked": null
+//     }
+//   ]
+// }
+
+export type SpuSaleAttrListModel = SpuSaleAttrModel[];
+
+export interface SpuSaleAttrModel {
+  id: number;
+  spuId: number;
+  baseSaleAttrId: number;
+  saleAttrName: string;
+  spuSaleAttrValueList: SpuSaleAttrValueListModel;
+}
+
+export type SpuSaleAttrValueListModel = SpuSaleAttrValueModel[];
+
+export interface SpuSaleAttrValueModel {
+  id: number;
+  spuId: number;
+  baseSaleAttrId: number;
+  saleAttrValueName: string;
+  saleAttrName: string;
+  isChecked: null;
 }

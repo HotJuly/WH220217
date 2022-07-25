@@ -5,9 +5,11 @@
         <el-table-column prop="spuName" label="SPU名称" />
         <el-table-column prop="description" label="SPU描述" />
         <el-table-column label="操作" >
-            <template #default>
+            <template #default="{row}">
                 <el-button type="primary" title="添加SKU" size="small" :icon="Plus"></el-button>
-                <el-button type="primary" title="修改SPU" size="small" :icon="Edit"></el-button>
+                <el-button type="primary" title="修改SPU" size="small" :icon="Edit"
+                @click="editSpu(row)"
+                ></el-button>
                 <el-button type="info" title="查看SKU" size="small" :icon="InfoFilled"></el-button>
                 <el-button type="danger" title="删除SPU" size="small" :icon="Delete"></el-button>
             </template>
@@ -32,7 +34,7 @@ import { Plus, Edit, Delete, InfoFilled } from '@element-plus/icons-vue';
 import { useCategoryStore } from '@/stores/category';
 
 import { getSpuPageListApi } from '@/api/product/spu';
-import type { SpuListModel } from '@/api/product/model/spuModel';
+import type { SpuListModel, SpuModel } from '@/api/product/model/spuModel';
 import { ElMessage } from 'element-plus';
 
 import { ShowStatus } from '../types';
@@ -46,6 +48,7 @@ const total = ref<number>(0);
 
 interface Emits{
     (event:"changeShowStatus",value:ShowStatus):void
+    (event:"setCurrentSpu",spu:SpuModel):void
 }
 const emits = defineEmits<Emits>();
 
@@ -70,6 +73,12 @@ const getSpuPageList = async () => {
 // 监视用户点击添加按钮,切换SPUForm组件显示操作
 const showAdd = ()=>{
     emits('changeShowStatus',ShowStatus.SpuForm);
+}
+
+// 用于监视用户点击修改SPU按钮
+const editSpu = (row:SpuModel)=>{
+    emits('changeShowStatus',ShowStatus.SpuForm);
+    emits('setCurrentSpu',row);
 }
 
 watch(() => categoryStore.category3Id, (newValue) => {
