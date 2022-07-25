@@ -1,88 +1,83 @@
 <template>
-    <el-form label-width="120px">
-        <el-form-item label="SPU名称">
-            <el-input v-model="spuForm.spuName" placeholder="请输入SPU名称" />
-        </el-form-item>
+  <el-form label-width="120px">
+    <el-form-item label="SPU名称">
+      <el-input v-model="spuForm.spuName" placeholder="请输入SPU名称" />
+    </el-form-item>
 
-        <el-form-item label="品牌">
-            <el-select v-model="spuForm.tmId" placeholder="请选择品牌">
-                <el-option 
-                v-for="tm in tmList"
-                :label="tm.tmName" 
-                :value="tm.id!"
-                :key="tm.id!"
-                >
-                </el-option>
-            </el-select>
-        </el-form-item>
+    <el-form-item label="品牌">
+      <el-select v-model="spuForm.tmId" placeholder="请选择品牌">
+        <el-option v-for="tm in tmList" :label="tm.tmName" :value="tm.id!" :key="tm.id!">
+        </el-option>
+      </el-select>
+    </el-form-item>
 
-        <el-form-item label="SPU描述">
-            <el-input v-model="spuForm.description" rows="4" type="textarea" placeholder="请输入详细描述" />
-        </el-form-item>
+    <el-form-item label="SPU描述">
+      <el-input v-model="spuForm.description" rows="4" type="textarea" placeholder="请输入详细描述" />
+    </el-form-item>
 
-        <el-form-item label="SPU图片">
-            <el-upload v-model:file-list="(spuImageList as any)"
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" list-type="picture-card"
-                :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-                <el-icon>
-                    <Plus />
-                </el-icon>
-            </el-upload>
+    <el-form-item label="SPU图片">
+      <el-upload v-model:file-list="(spuImageList as any)"
+        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" list-type="picture-card"
+        :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+        <el-icon>
+          <Plus />
+        </el-icon>
+      </el-upload>
 
-            <el-dialog v-model="dialogVisible">
-                <img w-full :src="dialogImageUrl" alt="Preview Image" />
-            </el-dialog>
-        </el-form-item>
+      <el-dialog v-model="dialogVisible">
+        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+      </el-dialog>
+    </el-form-item>
 
-        <el-form-item label="销售属性">
-            <el-select v-model="d" placeholder="">
-                <el-option
-                    label="label1"
-                    value="1">
-                </el-option>
-                <el-option
-                    label="label2"
-                    value="2">
-                </el-option>
-            </el-select>
-            <el-button type="primary" :icon="Plus">添加销售属性</el-button>
+    <el-form-item label="销售属性">
+      <el-select v-model="d" placeholder="">
+        <el-option label="label1" value="1">
+        </el-option>
+        <el-option label="label2" value="2">
+        </el-option>
+      </el-select>
+      <el-button type="primary" :icon="Plus">添加销售属性</el-button>
 
-            <el-table :data="spuForm.spuSaleAttrList" style="width: 100%;margin:20px 0;" border>
-                <el-table-column
-                    type="index"
-                    label="序号"
-                    width="80">
-                </el-table-column>
-                <el-table-column
-                    prop="saleAttrName"
-                    label="属性名"
-                    width="150">
-                </el-table-column>
-                <el-table-column
-                    label="属性值名称列表">
-                    <template #default>
-                      1
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    prop="prop"
-                    label="操作"
-                    width="150">
-                    <template #default>
-                      <el-button type="danger" :icon="Delete"></el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            
-            <el-button type="primary">保存</el-button>
-            <el-button @click="cancel">取消</el-button>
-        </el-form-item>
-    </el-form>
+      <el-table :data="spuForm.spuSaleAttrList" style="width: 100%;margin:20px 0;" border>
+        <el-table-column type="index" label="序号" width="80">
+        </el-table-column>
+        <el-table-column prop="saleAttrName" label="属性名" width="150">
+        </el-table-column>
+        <el-table-column label="属性值名称列表">
+          <template #default="{ row }">
+            <el-tag 
+            v-for="saleAttr in row.spuSaleAttrValueList" 
+            :key="saleAttr.id" 
+             type="success"
+            style="margin-right:10px" 
+            closable 
+            :disable-transitions="false"
+              @close="">
+              {{ saleAttr.saleAttrValueName }}
+            </el-tag>
+            <el-input v-if="row.isEdit" ref="InputRef" v-model="row.inputValue" size="small"
+              @keyup.enter="" @blur="" />
+            <el-button v-else class="button-new-tag ml-1" size="small" @click="">
+              + New Tag
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="prop" label="操作" width="150">
+          <template #default>
+            <el-button type="danger" :icon="Delete"></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-button type="primary">保存</el-button>
+      <el-button @click="cancel">取消</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script lang="ts">
 export default {
-    name: "SpuForm"
+  name: "SpuForm"
 }
 
 </script>
@@ -100,14 +95,13 @@ import { ShowStatus } from '../types';
 import type { SpuModel, BaseSaleAttrListModel, SpuImageListModel } from '@/api/product/model/spuModel';
 import type { TrademarkListModel } from '@/api/product/model/TrademarkModel';
 
-interface Emits{
-    (event:"changeShowStatus",value:ShowStatus):void
+interface Emits {
+  (event: "changeShowStatus", value: ShowStatus): void
 }
-
 const emits = defineEmits<Emits>();
 
-interface Props{
-    currentSpu:SpuModel
+interface Props {
+  currentSpu: SpuModel
 }
 
 const props = defineProps<Props>();
@@ -138,38 +132,39 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
   dialogVisible.value = true
 }
 
-const cancel = ()=>{
-    emits('changeShowStatus',ShowStatus.SpuList);
+const cancel = () => {
+  emits('changeShowStatus', ShowStatus.SpuList);
 }
 
-const getTrademarkList = async ()=>{
+const getTrademarkList = async () => {
   tmList.value = await getTrademarkListApi();
 }
 
-const getBaseSaleAttrList = async ()=>{
+const getBaseSaleAttrList = async () => {
   baseSaleAttrList.value = await getBaseSaleAttrListApi();
 }
 
-const getSpuImageList = async ()=>{
+const getSpuImageList = async () => {
   // baseSaleAttrList.value = await getSpuImageListApi(spuForm.id as number);
   spuImageList.value = await getSpuImageListApi(spuForm.id!);
+
   // 由于upload组件,想要展示图片墙,要求每个对象必须具有name和url属性,所以在此动态添加
-  spuImageList.value?.forEach((imageObj)=>{
+  spuImageList.value?.forEach((imageObj) => {
     imageObj.url = imageObj.imgUrl;
     imageObj.name = imageObj.imgName;
   })
 }
 
-const getSpuSaleAttrList = async ()=>{
+const getSpuSaleAttrList = async () => {
   spuForm.spuSaleAttrList = await getSpuSaleAttrListApi(spuForm.id!);
 }
 
-onMounted(()=>{
+onMounted(() => {
   // 以下两个请求,无论是添加还是修改都要发送
   getTrademarkList();
   getBaseSaleAttrList();
 
-  if(spuForm.id){
+  if (spuForm.id) {
     // 说明当前是修改SPU
     getSpuImageList();
     getSpuSaleAttrList();
