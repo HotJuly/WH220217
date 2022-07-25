@@ -49,8 +49,8 @@ export interface SpuModel {
   category3Id: number | undefined;
   //   所属品牌id,必有
   tmId: number | undefined;
-  spuSaleAttrList: null;
-  spuImageList: null;
+  spuSaleAttrList: SpuSaleAttrListModel;
+  spuImageList: SpuImageListModel;
 }
 
 export type BaseSaleAttrListModel = BaseSaleAttrModel[];
@@ -67,6 +67,10 @@ export interface SpuImageModel {
   spuId: number;
   imgName: string;
   imgUrl: string;
+
+  // 以下两个属性用于显示图片墙功能
+  name?:string;
+  url?:string;
 }
 
 // {
