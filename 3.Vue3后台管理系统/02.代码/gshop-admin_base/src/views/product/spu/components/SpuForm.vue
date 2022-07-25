@@ -33,10 +33,10 @@
       <el-select v-model="selectedSaleAttr" placeholder="">
         <el-option 
         v-for="attr in unusedSaleAttrList"
-        :label="attr.name" :value="attr.id" :key="attr.id">
+        :label="attr.name" :value="`${attr.name}:${attr.id}`" :key="attr.id">
         </el-option>
       </el-select>
-      <el-button type="primary" :icon="Plus">添加销售属性</el-button>
+      <el-button type="primary" :icon="Plus" @click="addSaleAttr">添加销售属性</el-button>
 
       <el-table :data="spuForm.spuSaleAttrList" style="width: 100%;margin:20px 0;" border>
         <el-table-column type="index" label="序号" width="80">
@@ -164,6 +164,29 @@ const getSpuSaleAttrList = async () => {
   spuForm.spuSaleAttrList = await getSpuSaleAttrListApi(spuForm.id!);
 }
 
+// 用于监视用户点击添加销售属性按钮,实现添加功能
+const addSaleAttr = ()=>{
+  // 往哪个数组中添加?spuForm.spuSaleAttrList
+  // 需要添加的内容格式?对象
+
+  // console.log(selectedSaleAttr.value)
+  // 将用户选中的销售属性框的结果,使用split切割,可以得到销售属性名以及销售属性id两个值
+  const [saleAttrName,baseSaleAttrId] = selectedSaleAttr.value.split(":");
+
+  // 生成一个属性对象添加到数组中,使得table表格中多出一行
+  spuForm.spuSaleAttrList.push({
+    // 当前属性的id
+    baseSaleAttrId: +baseSaleAttrId,
+    // 当前的属性名称
+    saleAttrName, 
+    // 当前的属性值列表
+    spuSaleAttrValueList:[]
+  })
+
+  // 添加完属性之后,记得清空该数据,防止select框中还残留错误显示
+  selectedSaleAttr.value="";
+}
+
 // 根据spu已使用的所有销售属性数组和当前平台所有的销售属性做对比,最终返回一个未使用的销售属性列表
 // 返回值数据类型:数组
 // 内容:未使用的销售属性对象
@@ -206,8 +229,7 @@ const unusedSaleAttrList = computed(()=>{
 
     // 第三种:对象+for循环
     // 通过一个对象记录已经出现过的销售属性
-    const mapObj = {};
-
+    const mapObj:any = {};
 
     spuForm.spuSaleAttrList?.forEach((spuSaleAttr)=>{
       const key = spuSaleAttr.saleAttrName;

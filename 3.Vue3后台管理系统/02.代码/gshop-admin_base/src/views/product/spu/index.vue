@@ -35,8 +35,8 @@ const initSpu = ():SpuModel => ({
     description: "",
     category3Id: undefined,
     tmId: undefined,
-    spuSaleAttrList: null,
-    spuImageList: null
+    spuSaleAttrList: [],
+    spuImageList: []
 })
 const currentSpu = ref<SpuModel>(initSpu());
 

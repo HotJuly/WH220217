@@ -93,8 +93,8 @@ export interface SpuImageModel {
 export type SpuSaleAttrListModel = SpuSaleAttrModel[];
 
 export interface SpuSaleAttrModel {
-  id: number;
-  spuId: number;
+  id?: number;
+  spuId?: number;
   baseSaleAttrId: number;
   saleAttrName: string;
   spuSaleAttrValueList: SpuSaleAttrValueListModel;
