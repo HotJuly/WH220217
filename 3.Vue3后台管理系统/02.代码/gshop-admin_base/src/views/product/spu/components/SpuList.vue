@@ -1,5 +1,5 @@
 <template>
-    <el-button type="primary" :icon="Plus">添加SPU</el-button>
+    <el-button type="primary" :icon="Plus" @click="showAdd">添加SPU</el-button>
     <el-table :data="tableData" border style="width: 100%;margin-top:10px;">
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="spuName" label="SPU名称" />
@@ -23,7 +23,6 @@
 export default {
     name: "SpuList"
 }
-
 </script>
 
 <script setup lang="ts">
@@ -36,12 +35,19 @@ import { getSpuPageListApi } from '@/api/product/spu';
 import type { SpuListModel } from '@/api/product/model/spuModel';
 import { ElMessage } from 'element-plus';
 
+import { ShowStatus } from '../types';
+
 const tableData = ref<SpuListModel>([]);
 
 const categoryStore = useCategoryStore();
 const currentPage = ref<number>(1);
 const pageSize = ref<number>(3);
 const total = ref<number>(0);
+
+interface Emits{
+    (event:"changeShowStatus",value:ShowStatus):void
+}
+const emits = defineEmits<Emits>();
 
 const handleCurrentChange = (page:number) => {
     currentPage.value = page;
@@ -59,6 +65,11 @@ const getSpuPageList = async () => {
     tableData.value = result.records;
     total.value = result.total;
     ElMessage.success("SPU列表展示成功");
+}
+
+// 监视用户点击添加按钮,切换SPUForm组件显示操作
+const showAdd = ()=>{
+    emits('changeShowStatus',ShowStatus.SpuForm);
 }
 
 watch(() => categoryStore.category3Id, (newValue) => {

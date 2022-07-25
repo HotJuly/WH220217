@@ -68,14 +68,14 @@ import type { RouteRecordRaw } from 'vue-router';
         path:"/product/spu/list",
         component:()=>import('@/views/product/spu/index.vue'),
         meta:{
-          title:"spu管理"
+          title:"SPU管理"
         }
       },
       {
         path:"/product/sku/list",
         component:()=>import('@/views/product/sku/index.vue'),
         meta:{
-          title:"sku管理"
+          title:"SKU管理"
         }
       },
       {

@@ -3,8 +3,8 @@
 
     <el-card>
         <SpuList v-if="showStatus === ShowStatus.SpuList" @changeShowStatus="changeShowStatus"/>
-        <SpuForm v-if="showStatus === ShowStatus.SpuForm" @changeShowStatus="changeShowStatus"/>
-        <SkuForm v-if="showStatus === ShowStatus.SkuForm" @changeShowStatus="changeShowStatus"/>
+        <SpuForm v-else-if="showStatus === ShowStatus.SpuForm" @changeShowStatus="changeShowStatus"/>
+        <SkuForm v-else-if="showStatus === ShowStatus.SkuForm" @changeShowStatus="changeShowStatus"/>
     </el-card>
 </template>
 
