@@ -17,7 +17,7 @@
 
     <el-form-item label="SPU图片">
       <el-upload v-model:file-list="(spuImageList as any)"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" list-type="picture-card"
+        :action="`${BASE_URL}/admin/product/fileUpload`" list-type="picture-card"
         :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
         <el-icon>
           <Plus />
@@ -25,15 +25,15 @@
       </el-upload>
 
       <el-dialog v-model="dialogVisible">
-        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+        <img w-full :src="dialogImageUrl" style="width:600px;" alt="Preview Image" />
       </el-dialog>
     </el-form-item>
 
     <el-form-item label="销售属性">
-      <el-select v-model="d" placeholder="">
-        <el-option label="label1" value="1">
-        </el-option>
-        <el-option label="label2" value="2">
+      <el-select v-model="selectedSaleAttr" placeholder="">
+        <el-option 
+        v-for="attr in unusedSaleAttrList"
+        :label="attr.name" :value="attr.id" :key="attr.id">
         </el-option>
       </el-select>
       <el-button type="primary" :icon="Plus">添加销售属性</el-button>
@@ -84,7 +84,7 @@ export default {
 
 <script setup lang="ts">
 
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 
@@ -94,6 +94,8 @@ import type { UploadProps, UploadUserFile } from 'element-plus'
 import { ShowStatus } from '../types';
 import type { SpuModel, BaseSaleAttrListModel, SpuImageListModel } from '@/api/product/model/spuModel';
 import type { TrademarkListModel } from '@/api/product/model/TrademarkModel';
+
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 interface Emits {
   (event: "changeShowStatus", value: ShowStatus): void
@@ -109,7 +111,7 @@ const props = defineProps<Props>();
 // 该对象用于收集所有的表单数据,后续用于发送请求
 const spuForm = reactive(cloneDeep(props.currentSpu))
 
-const d = ref('')
+const selectedSaleAttr = ref('')
 
 // 用于存储当前平台所有品牌
 const tmList = ref<TrademarkListModel>()
@@ -118,16 +120,19 @@ const tmList = ref<TrademarkListModel>()
 const baseSaleAttrList = ref<BaseSaleAttrListModel>()
 
 // 用于存储当前spu的所有图片信息(暂时不放在spuForm身上,等确定修改再放入)
+// 注意:由于upload组件上传和删除图片时候,都会自动修改该数组的内容,其中的数据结构不适合发送请求,后续需要做数据处理
 const spuImageList = ref<SpuImageListModel>()
 
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
-  console.log(uploadFile, uploadFiles)
+  // 当用户删除了图片墙中的东西时,会执行该回调函数
+  // console.log(uploadFile, uploadFiles)
 }
 
 const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+  console.log('uploadFile',uploadFile)
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
@@ -159,6 +164,65 @@ const getSpuSaleAttrList = async () => {
   spuForm.spuSaleAttrList = await getSpuSaleAttrListApi(spuForm.id!);
 }
 
+// 根据spu已使用的所有销售属性数组和当前平台所有的销售属性做对比,最终返回一个未使用的销售属性列表
+// 返回值数据类型:数组
+// 内容:未使用的销售属性对象
+const unusedSaleAttrList = computed(()=>{
+
+    /*
+      类似于数组去重
+      思路:
+        1.双层for循环,缺点性能,而且逻辑一般
+        2.映射标识+for循环
+        3.对象+for循环
+    */
+  // 1.双层for循环,缺点性能,而且逻辑一般
+    // const newArr = baseSaleAttrList.value?.filter((baseSaleAttr)=>{
+    //   // 如果返回值为true,就保留当前对象
+    //   // 问题:什么条件的对象是需要保留的?
+    //   // 解答:也就是说如果未使用过就保留,
+    //   // 未使用的定义:当前的销售属性没有在已使用过的数组中出现,就是未使用
+
+    //   // 需要查找的属性名
+    //   const saleAttrName = baseSaleAttr.name;
+
+    //   // some的用处是只要有一个满足条件就返回true
+    //   const result = spuForm.spuSaleAttrList.some((spuSaleAttr)=>{
+    //     return spuSaleAttr.saleAttrName === saleAttrName;
+    //   });
+
+    //   return !result;
+    // })
+
+
+    // 第二种:映射标识+for循环,缺点性能也差,但是代码嵌套不深,容易理解
+    // const names = spuForm.spuSaleAttrList.map((spuSaleAttr)=>{
+    //   return spuSaleAttr.saleAttrName;
+    // })
+
+    // const newArr = baseSaleAttrList.value?.filter((baseSaleAttr)=>{
+    //   return !names.includes(baseSaleAttr.name);
+    // })
+
+    // 第三种:对象+for循环
+    // 通过一个对象记录已经出现过的销售属性
+    const mapObj = {};
+
+
+    spuForm.spuSaleAttrList?.forEach((spuSaleAttr)=>{
+      const key = spuSaleAttr.saleAttrName;
+      mapObj[key] = true;
+    })
+
+    const newArr = baseSaleAttrList.value?.filter((baseSaleAttr)=>{
+      const name = baseSaleAttr.name;
+      return !mapObj[name];
+    })
+
+
+    return newArr;
+})
+
 onMounted(() => {
   // 以下两个请求,无论是添加还是修改都要发送
   getTrademarkList();
@@ -170,6 +234,10 @@ onMounted(() => {
     getSpuSaleAttrList();
   }
 })
+
+// setTimeout(()=>{
+//   console.log(baseSaleAttrList.value,spuForm.spuSaleAttrList)
+// },3000)
 </script>
 
 <style scoped>
