@@ -1,12 +1,12 @@
 <template>
     <el-button type="primary" :icon="Plus" @click="showAdd">添加SPU</el-button>
     <el-table :data="tableData" border style="width: 100%;margin-top:10px;">
-        <el-table-column type="index" label="序号" width="80" />
+        <el-table-column type="index" align="center" label="序号" width="80" />
         <el-table-column prop="spuName" label="SPU名称" />
         <el-table-column prop="description" label="SPU描述" />
         <el-table-column label="操作">
             <template #default="{ row }">
-                <el-button type="primary" title="添加SKU" size="small" :icon="Plus"></el-button>
+                <el-button type="primary" title="添加SKU" size="small" :icon="Plus" @click="toSkuForm(row)"></el-button>
                 <el-button type="primary" title="修改SPU" size="small" :icon="Edit" @click="editSpu(row)"></el-button>
                 <el-button type="info" title="查看SKU" size="small" :icon="InfoFilled"></el-button>
                 <el-button type="danger" title="删除SPU" size="small" :icon="Delete" @click="deleteSpu(row)"></el-button>
@@ -100,6 +100,15 @@ const deleteSpu =async  (spu: SpuModel) => {
     ElMessage.success(`${spu.spuName}已删除`);
     currentPage.value = tableData.value.length>1?currentPage.value:currentPage.value-1;
     getSpuPageList();
+}
+
+const toSkuForm = (row:SpuModel)=>{
+    emits("changeShowStatus",ShowStatus.SkuForm);
+    emits("setCurrentSpu",{
+        ...row,
+        spuImageList:[],
+        spuSaleAttrList:[]
+    });
 }
 
 watch(() => categoryStore.category3Id, (newValue) => {

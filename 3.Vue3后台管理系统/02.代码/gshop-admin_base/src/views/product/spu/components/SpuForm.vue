@@ -81,6 +81,7 @@ import { cloneDeep } from 'lodash'
 import { getTrademarkListApi, getBaseSaleAttrListApi, getSpuImageListApi, getSpuSaleAttrListApi, SaveSpuInfoApi,UpdateSpuInfoApi } from '@/api/product/spu';
 import { useCategoryStore } from '@/stores/category';
 
+
 import { type UploadProps, type UploadUserFile, type InputInstance,type FormInstance, type FormRules, ElMessage } from 'element-plus'
 import { ShowStatus } from '../types';
 import type { SpuModel, BaseSaleAttrListModel, SpuImageListModel, SpuSaleAttrModel } from '@/api/product/model/spuModel';
