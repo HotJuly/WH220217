@@ -24,19 +24,10 @@
 
         <el-form-item label="平台属性">
             <el-form inline>
-                <el-form-item label="手机一级">
+                <el-form-item v-for="attr in attrList" :key="attr.id" :label="attr.attrName">
                     <el-select placeholder="请选择">
-                        <el-option label="苹果" value="1">
-                        </el-option>
-                        <el-option label="华为" value="2">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="手机一级">
-                    <el-select placeholder="请选择">
-                        <el-option label="苹果" value="1">
-                        </el-option>
-                        <el-option label="华为" value="2">
+                        <el-option v-for="attrValue in attr.attrValueList" :label="attrValue.valueName"
+                            :value="attrValue.id!" :key="attrValue.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -45,19 +36,10 @@
 
         <el-form-item label="销售属性">
             <el-form inline>
-                <el-form-item label="手机一级">
+                <el-form-item v-for="saleAttr in spuSaleAttrList" :key="saleAttr.id" :label="saleAttr.saleAttrName">
                     <el-select placeholder="请选择">
-                        <el-option label="苹果" value="1">
-                        </el-option>
-                        <el-option label="华为" value="2">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="手机一级">
-                    <el-select placeholder="请选择">
-                        <el-option label="苹果" value="1">
-                        </el-option>
-                        <el-option label="华为" value="2">
+                        <el-option v-for="saleAttrValue in saleAttr.spuSaleAttrValueList" :label="saleAttrValue.saleAttrValueName"
+                            :value="saleAttrValue.id!" :key="saleAttrValue.id!">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -65,12 +47,15 @@
         </el-form-item>
 
         <el-form-item label="图片列表">
-            <el-table border style="width: 100%">
+            <el-table :data="spuImageList" border style="width: 100%">
                 <el-table-column type="selection" width="50">
                 </el-table-column>
                 <el-table-column label="图片">
+                    <template #default="{ row }">
+                        <img :src="row.imgUrl" style="width:100px;height:100px;" alt="" srcset="">
+                    </template>
                 </el-table-column>
-                <el-table-column label="名称">
+                <el-table-column prop="imgName" label="名称">
                 </el-table-column>
                 <el-table-column label="操作">
                 </el-table-column>
@@ -90,8 +75,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import type { SpuModel } from '@/api/product/model/spuModel';
-import { ref } from 'vue';
+import { getAttrInfoListApi } from '@/api/product/attr'
+import { getSpuSaleAttrListApi, getSpuImageListApi } from '@/api/product/spu'
+import { useCategoryStore } from '@/stores/category';
+
+import type { SpuModel, SpuSaleAttrListModel, SpuImageListModel } from '@/api/product/model/spuModel';
+import type { AttrListModel } from '@/api/product/model/attrModel';
+import { onMounted, ref } from 'vue';
+import { ElMessage } from 'element-plus';
+
+const categoryStore = useCategoryStore();
 
 interface Props {
     currentSpu: SpuModel
@@ -99,6 +92,15 @@ interface Props {
 
 const props = defineProps<Props>();
 
+/*
+    该模块一共使用三个接口
+        1.请求当前SPU所有的图片信息
+            在spu.ts中查找
+        2.请求当前SPU所有的销售属性
+            在spu.ts中查找
+        3.请求当前分类下所有的平台属性
+            在attr.ts中查找
+*/
 const initData = () => ({
     // 以下三者数据都是SPU自带的，不需要我们收集
     category3Id: props.currentSpu.category3Id,
@@ -150,6 +152,45 @@ const initData = () => ({
 });
 const skuForm = ref(initData());
 
+// 用于存储当前分类下所有的平台属性
+const attrList = ref<AttrListModel>([]);
+
+// 用于存储当前分类下所有的平台属性
+const spuSaleAttrList = ref<SpuSaleAttrListModel>([]);
+
+// 用于存储当前分类下所有的平台属性
+const spuImageList = ref<SpuImageListModel>([]);
+
+
+const getAttrInfoList = async () => {
+    attrList.value = await getAttrInfoListApi({
+        category1Id: categoryStore.category1Id,
+        category2Id: categoryStore.category2Id,
+        category3Id: categoryStore.category3Id
+    });
+}
+
+const getSpuImageList = async () => {
+    spuImageList.value = await getSpuImageListApi(props.currentSpu.id!);
+}
+
+const getSpuSaleAttrList = async () => {
+    spuSaleAttrList.value = await getSpuSaleAttrListApi(props.currentSpu.id!);
+}
+
+onMounted(() => {
+    /*
+        async函数的返回值,一定是一个promise对象
+        如果async函数中的代码执行结束,那么返回的promise对象的状态就会变为成功
+    */
+    const promise1 = getAttrInfoList();
+    const promise2 = getSpuImageList();
+    const promise3 = getSpuSaleAttrList();
+    Promise.all([promise1, promise2, promise3])
+        .then(() => {
+            ElMessage.success("可以开始添加SKU了")
+        })
+})
 </script>
 
 <style scoped>
