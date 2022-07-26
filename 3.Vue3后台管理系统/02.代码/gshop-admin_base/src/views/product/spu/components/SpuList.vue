@@ -48,7 +48,7 @@ const total = ref<number>(0);
 
 interface Emits{
     (event:"changeShowStatus",value:ShowStatus):void
-    (event:"setCurrentSpu",spu:SpuModel):void
+    (event:"setCurrentSpu",spu?:SpuModel):void
 }
 const emits = defineEmits<Emits>();
 
@@ -73,6 +73,7 @@ const getSpuPageList = async () => {
 // 监视用户点击添加按钮,切换SPUForm组件显示操作
 const showAdd = ()=>{
     emits('changeShowStatus',ShowStatus.SpuForm);
+    emits('setCurrentSpu');
 }
 
 // 用于监视用户点击修改SPU按钮

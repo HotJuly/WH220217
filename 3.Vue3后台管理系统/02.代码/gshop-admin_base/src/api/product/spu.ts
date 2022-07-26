@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import type { SpuPageListModel, BaseSaleAttrListModel, SpuImageListModel, SpuSaleAttrListModel } from './model/spuModel';
+import type { SpuModel, SpuPageListModel, BaseSaleAttrListModel, SpuImageListModel, SpuSaleAttrListModel } from './model/spuModel';
 import type { TrademarkListModel } from './model/TrademarkModel';
 
 enum Api{
@@ -16,6 +16,12 @@ enum Api{
 
     // 4.用于请求当前spu的销售属性列表信息(在SKU接口中找),只有修改要用
     GetSpuSaleAttrListApi = "/admin/product/spuSaleAttrList",
+
+    // 5.用于新增SPU的信息
+    SaveSpuInfoApi = "/admin/product/saveSpuInfo",
+
+    // 6.用于修改SPU的信息
+    UpdateSpuInfoApi = "/admin/product/updateSpuInfo"
 
 }
 
@@ -41,4 +47,12 @@ export const getSpuImageListApi = (spuId:number)=>{
 // 4.用于返回当前spu所有的销售属性信息
 export const getSpuSaleAttrListApi = (spuId:number)=>{
     return request.get<any,SpuSaleAttrListModel>(`${Api.GetSpuSaleAttrListApi}/${spuId}`)
+}
+
+export const SaveSpuInfoApi = (spuForm:SpuModel)=>{
+    return request.post<any,null>(Api.SaveSpuInfoApi,spuForm)
+}
+
+export const UpdateSpuInfoApi = (spuForm:SpuModel)=>{
+    return request.post<any,null>(Api.UpdateSpuInfoApi,spuForm)
 }

@@ -63,14 +63,17 @@ export interface BaseSaleAttrModel {
 export type SpuImageListModel = SpuImageModel[];
 
 export interface SpuImageModel {
-  id: number;
-  spuId: number;
+  id?: number;
+  spuId?: number;
   imgName: string;
   imgUrl: string;
 
   // 以下两个属性用于显示图片墙功能
   name?:string;
   url?:string;
+  response?:{
+    data:string;
+  }
 }
 
 // {
