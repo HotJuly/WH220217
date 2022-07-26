@@ -114,7 +114,7 @@ const baseSaleAttrList = ref<BaseSaleAttrListModel>()
 
 // 用于存储当前spu的所有图片信息(暂时不放在spuForm身上,等确定修改再放入)
 // 注意:由于upload组件上传和删除图片时候,都会自动修改该数组的内容,其中的数据结构不适合发送请求,后续需要做数据处理
-const spuImageList = ref<SpuImageListModel>()
+const spuImageList = ref<SpuImageListModel>([])
 
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
@@ -285,7 +285,7 @@ const save= async ()=>{
       size: 476282
       status: "success"
       uid: 1658807602235
-      url:""
+      url:""(注意,这种格式的图片对象的url是本地链接,无法使用)
     }
 
     最终,我们需要处理成什么样?

@@ -1,7 +1,7 @@
 <template>
     <CategorySelector :disabled="false" />
 
-    <el-card>
+    <el-card style="margin-top:10px">
         <SpuList v-if="showStatus === ShowStatus.SpuList" @setCurrentSpu="setCurrentSpu" @changeShowStatus="changeShowStatus" />
         <SpuForm v-else-if="showStatus === ShowStatus.SpuForm" :currentSpu="currentSpu" @changeShowStatus="changeShowStatus" />
         <SkuForm v-else-if="showStatus === ShowStatus.SkuForm" @changeShowStatus="changeShowStatus" />

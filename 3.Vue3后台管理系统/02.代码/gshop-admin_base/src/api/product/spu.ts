@@ -21,7 +21,10 @@ enum Api{
     SaveSpuInfoApi = "/admin/product/saveSpuInfo",
 
     // 6.用于修改SPU的信息
-    UpdateSpuInfoApi = "/admin/product/updateSpuInfo"
+    UpdateSpuInfoApi = "/admin/product/updateSpuInfo",
+
+    // 7.用于删除指定的spu
+    deleteSpuApi = "/admin/product/deleteSpu"
 
 }
 
@@ -55,4 +58,8 @@ export const SaveSpuInfoApi = (spuForm:SpuModel)=>{
 
 export const UpdateSpuInfoApi = (spuForm:SpuModel)=>{
     return request.post<any,null>(Api.UpdateSpuInfoApi,spuForm)
+}
+
+export const deleteSpuApi = (id:number)=>{
+    return request.delete<any,null>(`${Api.deleteSpuApi}/${id}`)
 }
