@@ -98,15 +98,19 @@ export interface SpuSaleAttrModel {
   baseSaleAttrId: number;
   saleAttrName: string;
   spuSaleAttrValueList: SpuSaleAttrValueListModel;
+
+  // 以下两个属性,用于控制编辑模式切换和收集数据
+  isEdit?:boolean;
+  inputValue?:string;
 }
 
 export type SpuSaleAttrValueListModel = SpuSaleAttrValueModel[];
 
 export interface SpuSaleAttrValueModel {
-  id: number;
-  spuId: number;
+  id?: number;
+  spuId?: number;
   baseSaleAttrId: number;
   saleAttrValueName: string;
-  saleAttrName: string;
-  isChecked: null;
+  saleAttrName?: string;
+  isChecked?: null;
 }

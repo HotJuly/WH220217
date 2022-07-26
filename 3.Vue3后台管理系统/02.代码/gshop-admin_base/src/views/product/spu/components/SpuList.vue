@@ -78,7 +78,11 @@ const showAdd = ()=>{
 // 用于监视用户点击修改SPU按钮
 const editSpu = (row:SpuModel)=>{
     emits('changeShowStatus',ShowStatus.SpuForm);
-    emits('setCurrentSpu',row);
+    emits('setCurrentSpu',{
+        ...row,
+        spuSaleAttrList:[],
+        spuImageList:[]
+    });
 }
 
 watch(() => categoryStore.category3Id, (newValue) => {
