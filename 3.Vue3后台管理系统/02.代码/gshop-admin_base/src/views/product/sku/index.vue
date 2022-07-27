@@ -1,5 +1,5 @@
 <template>
-    <el-card>
+    <el-card id="sku">
         <el-table :data="skuList" border>
             <el-table-column label="序号" type="index" align="center" width="80"></el-table-column>
             <el-table-column prop="skuName" label="名称"></el-table-column>
@@ -29,38 +29,33 @@
         <el-drawer v-model="isShowDrawer" :with-header="false" size="50%" direction="rtl">
             <el-row>
                 <el-col :span="5">名称</el-col>
-                <el-col :span="16">{{currentSku.skuName}}</el-col>
+                <el-col :span="16">{{ currentSku.skuName }}</el-col>
             </el-row>
             <el-row>
                 <el-col :span="5">描述</el-col>
-                <el-col :span="16">{{currentSku.skuDesc}}</el-col>
+                <el-col :span="16">{{ currentSku.skuDesc }}</el-col>
             </el-row>
             <el-row>
                 <el-col :span="5">价格</el-col>
-                <el-col :span="16">{{currentSku.price}}</el-col>
+                <el-col :span="16">{{ currentSku.price }}</el-col>
             </el-row>
             <el-row>
                 <el-col :span="5">平台属性</el-col>
                 <el-col :span="18">
-                    <el-tag 
-                    v-for="attr in currentSku.skuAttrValueList"
-                    :key="attr.valueId"
-                    style="margin-right:10px;"
-                    type="success" >
-                    {{attr.attrName +'-'+ attr.valueName}}
+                    <el-tag v-for="attr in currentSku.skuAttrValueList" :key="attr.valueId" style="margin-right:10px;"
+                        type="success">
+                        {{ attr.attrName + '-' + attr.valueName }}
                     </el-tag>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="5">销售属性</el-col>
                 <el-col :span="18">
-                    <el-tag 
-                    v-for="attr in currentSku.skuSaleAttrValueList"
-                    :key="attr.saleAttrValueId"
-                    style="margin-right:10px;"
-                    type="success" >
-                    {{attr.saleAttrName +'-'+ attr.saleAttrValueName}}
-                    </el-tag></el-col>
+                    <el-tag v-for="attr in currentSku.skuSaleAttrValueList" :key="attr.saleAttrValueId"
+                        style="margin-right:10px;" type="success">
+                        {{ attr.saleAttrName + '-' + attr.saleAttrValueName }}
+                    </el-tag>
+                </el-col>
             </el-row>
             <el-row>
                 <el-col :span="5">商品图片</el-col>
@@ -98,7 +93,7 @@ const total = ref<number>(0);
 // 用于控制抽屉的显示隐藏
 const isShowDrawer = ref<boolean>(false);
 
-const initData = ():SkuModel => ({
+const initData = (): SkuModel => ({
     category3Id: undefined,
     spuId: undefined,
     tmId: undefined,
@@ -120,11 +115,14 @@ const initData = ():SkuModel => ({
 // 用于存储抽屉组件中需要展示的sku的数据
 const currentSku = ref<SkuModel>(initData());
 
-const handleCurrentChange = () => {
-
+const handleCurrentChange = (page: number) => {
+    currentPage.value = page
+    getSkuPageList();
 }
-const handleSizeChange = () => {
-
+const handleSizeChange = (size: number) => {
+    currentPage.value = 1;
+    pageSize.value = size;
+    getSkuPageList();
 }
 
 // 当前函数需要接受两个参数,可以不穿,如果不传参数相当于是刷新当前列表
@@ -152,7 +150,7 @@ const cancelSale = async (row: SkuModel) => {
 }
 
 // 用于控制抽屉组件的显示隐藏
-const showDrawer =async (row:SkuModel) => {
+const showDrawer = async (row: SkuModel) => {
     currentSku.value = await getSkuInfoApi(row.id!);
     isShowDrawer.value = true;
 }
@@ -162,5 +160,32 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+/* .row{
+    text-align:right;
+    font-size:20px;
+
+} */
+
+
+#sku{
+    .el-col-5 {
+        text-align: right;
+        margin-right: 10px;
+        font-size: 20px;
+    }
+    :deep(.el-carousel__indicator){
+        button{
+            background-color: pink;
+        }
+
+        &.is-active {
+
+            // &是父级引用器,这里的意思是carousel__indicator元素必须还拥有is-active类名,内部的样式才会生效
+            button {
+                background-color: red;
+            }
+        }
+    }
+}
 </style>
