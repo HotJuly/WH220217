@@ -1,3 +1,5 @@
+export type SkuListModel = SkuModel[];
+
 export interface SkuModel{
     // 以下三者数据都是SPU自带的，不需要我们收集
     category3Id: number|undefined,

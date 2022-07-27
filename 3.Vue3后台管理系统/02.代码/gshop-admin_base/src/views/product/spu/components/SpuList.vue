@@ -8,7 +8,10 @@
             <template #default="{ row }">
                 <el-button type="primary" title="添加SKU" size="small" :icon="Plus" @click="toSkuForm(row)"></el-button>
                 <el-button type="primary" title="修改SPU" size="small" :icon="Edit" @click="editSpu(row)"></el-button>
-                <el-button type="info" title="查看SKU" size="small" :icon="InfoFilled"></el-button>
+                <el-button type="info" title="查看SKU" size="small" 
+                :icon="InfoFilled"
+                @click="showSkuList(row)"
+                ></el-button>
                 <el-button type="danger" title="删除SPU" size="small" :icon="Delete" @click="deleteSpu(row)"></el-button>
             </template>
         </el-table-column>
@@ -17,6 +20,20 @@
     <el-pagination style="margin-top:10px;" v-model:currentPage="currentPage" v-model:page-size="pageSize"
         :page-sizes="[3, 6, 9, 12]" layout="prev, pager, next, jumper,->,sizes,total" :total="total"
         @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+
+    <el-dialog v-model="isShowSkuList" :title="`${spu?.spuName}=> SKU列表`">
+        <el-table :data="skuList">
+            <el-table-column property="skuName" label="名称" />
+            <el-table-column property="price" label="价格(元)"/>
+            <el-table-column property="weight" label="重量(千克)" />
+            <el-table-column  label="默认图片" >
+                <template #default="{row}">
+                    <img :src="row.skuDefaultImg" style="width:100px;" alt="" srcset="">
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-dialog>
+
 </template>
 
 <script lang="ts">
@@ -32,7 +49,9 @@ import { Plus, Edit, Delete, InfoFilled } from '@element-plus/icons-vue';
 import { useCategoryStore } from '@/stores/category';
 
 import { getSpuPageListApi, deleteSpuApi } from '@/api/product/spu';
+import { getSkuListApi } from '@/api/product/sku';
 import type { SpuListModel, SpuModel } from '@/api/product/model/spuModel';
+import type { SkuListModel } from '@/api/product/model/skuModel';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 import { ShowStatus } from '../types';
@@ -43,6 +62,15 @@ const categoryStore = useCategoryStore();
 const currentPage = ref<number>(1);
 const pageSize = ref<number>(6);
 const total = ref<number>(0);
+
+// 用于控制dialog显示隐藏
+const isShowSkuList = ref<boolean>(false);
+
+// 用于存储服务器返回的sku的列表数据
+const skuList = ref<SkuListModel>([]);
+
+// 用于存储用户选中的spu
+const spu = ref<SpuModel>();
 
 interface Emits {
     (event: "changeShowStatus", value: ShowStatus): void
@@ -109,6 +137,13 @@ const toSkuForm = (row:SpuModel)=>{
         spuImageList:[],
         spuSaleAttrList:[]
     });
+}
+
+// 用于监视用户点击查看SKU按钮
+const showSkuList =async (row:SpuModel)=>{
+    spu.value = row;
+    skuList.value = await getSkuListApi(row.id!);
+    isShowSkuList.value = true;
 }
 
 watch(() => categoryStore.category3Id, (newValue) => {
