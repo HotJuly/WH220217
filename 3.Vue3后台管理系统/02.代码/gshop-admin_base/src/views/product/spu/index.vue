@@ -1,5 +1,5 @@
 <template>
-    <CategorySelector :disabled="false" />
+    <CategorySelector :disabled="showStatus !== ShowStatus.SpuList" />
 
     <el-card style="margin-top:10px">
         <SpuList v-if="showStatus === ShowStatus.SpuList" @setCurrentSpu="setCurrentSpu" @changeShowStatus="changeShowStatus" />
