@@ -65,8 +65,8 @@
                 </el-table-column>
             </el-table>
 
-            <el-button type="primary">保存</el-button>
-            <el-button>取消</el-button>
+            <el-button type="primary" @click="save">保存</el-button>
+            <el-button @click="cancel">取消</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -81,12 +81,15 @@ export default {
 <script setup lang="ts">
 import { getAttrInfoListApi } from '@/api/product/attr'
 import { getSpuSaleAttrListApi, getSpuImageListApi } from '@/api/product/spu'
+import { SaveSkuInfoApi } from '@/api/product/sku'
 import { useCategoryStore } from '@/stores/category';
 
+import type { SkuModel} from '@/api/product/model/skuModel'
 import type { SpuModel, SpuSaleAttrListModel, SpuImageListModel } from '@/api/product/model/spuModel';
 import type { AttrListModel } from '@/api/product/model/attrModel';
 import { onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
+import { ShowStatus } from '../types';
 
 const categoryStore = useCategoryStore();
 
@@ -95,6 +98,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+interface Emits {
+    (event:"changeShowStatus",value:ShowStatus):void
+}
+
+const emits = defineEmits<Emits>();
 
 /*
     该模块一共使用三个接口
@@ -105,7 +114,7 @@ const props = defineProps<Props>();
         3.请求当前分类下所有的平台属性
             在attr.ts中查找
 */
-const initData = () => ({
+const initData = ():SkuModel => ({
     // 以下三者数据都是SPU自带的，不需要我们收集
     category3Id: props.currentSpu.category3Id,
     spuId: props.currentSpu.id,
@@ -219,6 +228,65 @@ const changeDefault = (index:number)=>{
     const imageObj = spuImageList.value[index];
     imageObj.isDefault="1";
     skuForm.value.skuDefaultImg = imageObj.imgUrl;
+}
+
+// 用于监视用户点击保存按钮
+const save =async ()=>{
+    // 1.收集数据
+
+    // 2.处理数据结构
+    // 2.1先处理所有的平台属性,如果用户没有选择的平台属性,发送请求不需要携带
+    const selectedAttrList = attrList.value.filter((attr)=>{
+        return attr.inputValue
+    });
+    skuForm.value.skuAttrValueList = selectedAttrList.map((attr)=>{
+        const [attrId,valueId] = attr.inputValue?.split("-")!;
+        return {
+            attrId: +attrId,
+            valueId: +valueId
+        }
+    })
+
+    // 2.2处理所有的销售属性,如果用户没有选择的平台属性,发送请求不需要携带
+    const selectedSaleAttrList = spuSaleAttrList.value.filter((saleAttr)=>{
+        return saleAttr.inputValue
+    });
+    
+    //     "saleAttrId": 0, 需要
+    //     "saleAttrValueId": 0,    需要
+    skuForm.value.skuSaleAttrValueList = selectedSaleAttrList.map((saleAttr)=>{
+        const [saleAttrId,saleAttrValueId] = saleAttr.inputValue?.split("-")!;
+        return {
+            saleAttrId: +saleAttrId,
+            saleAttrValueId: +saleAttrValueId
+        }
+    })
+
+    //  2.3 处理所有的图片信息,将用户选中的图片传给服务器
+    
+    //     "imgName": "string", 需要
+    //     "imgUrl": "string",  需要
+    //     "isDefault": "string",   需要
+    //     "spuImgId": 0 需要
+    skuForm.value.skuImageList = selectedImageList.value.map((imageObj)=>{
+        const {imgName,imgUrl,isDefault,id} = imageObj;
+        return {
+            imgName,
+            imgUrl,
+            isDefault:isDefault!,
+            spuImgId:id!
+        }
+    })
+
+    // 3 发送请求
+    await SaveSkuInfoApi(skuForm.value);
+    ElMessage.success("添加SKU成功");
+    emits("changeShowStatus",ShowStatus.SpuList);
+}
+
+// 用于监视用户点击取消按钮
+const cancel = ()=>{
+    emits("changeShowStatus",ShowStatus.SpuList);
 }
 
 onMounted(() => {
