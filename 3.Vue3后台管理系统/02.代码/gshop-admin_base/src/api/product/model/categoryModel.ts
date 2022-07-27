@@ -5,6 +5,10 @@ export type Numberable = number | undefined;
 export interface CategoryModel {
   id: number;
   name: string;
+
+  // 用于分类模块实现树形结构效果
+  hasChildren?:boolean;
+  level?:number;
 }
 
 export type CategoryListModel = CategoryModel[];
