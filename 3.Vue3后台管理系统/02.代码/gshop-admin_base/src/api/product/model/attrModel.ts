@@ -40,6 +40,9 @@ export interface AttrModel {
   categoryId: number | undefined;
   categoryLevel: number;
   attrValueList: AttrValueListModel;
+
+  // 以下属性用于临时收集用户所选的平台属性值
+  inputValue?:string
 }
 
 export type AttrListModel = AttrModel[];

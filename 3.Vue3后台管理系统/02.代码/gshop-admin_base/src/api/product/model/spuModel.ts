@@ -73,7 +73,10 @@ export interface SpuImageModel {
   url?:string;
   response?:{
     data:string;
-  }
+  };
+
+  // 以下属性用于声明是否为默认图,在skuform模块中使用
+  isDefault?:string;
 }
 
 // {
