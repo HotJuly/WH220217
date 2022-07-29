@@ -3,12 +3,16 @@
 export type Numberable = number | undefined;
 
 export interface CategoryModel {
-  id: number;
+  id?: number;
   name: string;
 
   // 用于分类模块实现树形结构效果
   hasChildren?:boolean;
   level?:number;
+
+  // 用于新增分类使用
+  category1Id?:number;
+  category2Id?:number;
 }
 
 export type CategoryListModel = CategoryModel[];
