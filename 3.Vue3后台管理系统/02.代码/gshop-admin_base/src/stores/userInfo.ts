@@ -7,7 +7,7 @@ import router from '@/router'
 import type { RouteRecordRaw } from 'vue-router';
 import {cloneDeep} from 'lodash';
 
-import {loginApi,getUserInfoApi} from '@/api/acl/login';
+import {loginApi,getUserInfoApi,logoutApi} from '@/api/acl/login';
 
 /*
   该函数的用处:
@@ -53,7 +53,7 @@ function addRoutes(asyncRoutes:RouteRecordRaw[]){
   // console.log(router.getRoutes())
 }
 
-function  resetRoutes(){
+function resetRoutes(){
   // router.getRoutes()可以获取到当前一共注册了哪些路由
   const routes = router.getRoutes();
   // 将所有的带名字的路由全部删除
@@ -146,7 +146,8 @@ export const useUserInfoStore = defineStore('userInfo', {
       // this.menuRoutes = staticRoutes;
     },
 
-    reset () {
+    async reset () {
+      await logoutApi();
 
       resetRoutes();
       // 删除local中保存的token

@@ -1,7 +1,7 @@
 <template>
     <el-card class="box-card">
         <template #header>
-            <el-button type="primary" :icon="Plus" @click="showDialog">添加</el-button>
+            <el-button v-has-permission="`btn.Trademark.add`" type="primary" :icon="Plus" @click="showDialog">添加</el-button>
         </template>
         <el-table :data="tableData" border style="width: 100%">
             <!-- 
@@ -20,8 +20,8 @@
             </el-table-column>
             <el-table-column label="操作">
                 <template #default="{ row }">
-                    <el-button type="warning" :icon="Edit" size="small" @click="handleEdit(row)"></el-button>
-                    <el-button type="danger" :icon="Delete" size="small" @click="handleDelete(row)"></el-button>
+                    <el-button  v-has-permission="`btn.Trademark.update`" type="warning" :icon="Edit" size="small" @click="handleEdit(row)"></el-button>
+                    <el-button  v-has-permission="`btn.Trademark.remove`" type="danger" :icon="Delete" size="small" @click="handleDelete(row)"></el-button>
                 </template>
             </el-table-column>
         </el-table>

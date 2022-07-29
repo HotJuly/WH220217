@@ -8,6 +8,7 @@ import router from './router'
 import './styles/index.scss'
 import ElSvg from './components/SvgIcon/ElSvg'
 import './permission'
+import directives from '@/directives';
 
 const app = createApp(App)
 
@@ -19,4 +20,5 @@ app.use(pinia)
   .use(ElementPlus, {
     locale: zhCn,
   })
+  .use(directives)
   .mount('#app')
