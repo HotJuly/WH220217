@@ -11,6 +11,13 @@ import type { RouteRecordRaw } from 'vue-router';
 /**
  * 静态路由（默认路由）
  */
+/*
+  路由一共分为三种:
+    1.常量路由->不需要任何权限,所有人都能访问的路由
+    2.异步路由->需要根据帐号的权限,来实现动态添加的路由
+    3.任意路由->匹配常量路由和异步路由中不存在的路由地址,常用于重定向会404
+*/
+// 该数组中只留常量路由
  export const staticRoutes: Array<RouteRecordRaw> = [
 	{
     path: '/login',
@@ -45,12 +52,20 @@ import type { RouteRecordRaw } from 'vue-router';
     }]
   },
 
+];
+
+/**
+ * 该数组只留异步路由
+ */
+export const allAsyncRoutes: Array<RouteRecordRaw> = [
   {
+    name:"Product",
     path:"/product",
     component:()=>import('@/layout/index.vue'),
     redirect:"/product/trademark/list",
     children:[
       {
+        name:"Trademark",
         path:"/product/trademark/list",
         component:()=>import('@/views/product/trademark/index.vue'),
         meta:{
@@ -58,6 +73,7 @@ import type { RouteRecordRaw } from 'vue-router';
         }
       },
       {
+        name:"Attr",
         path:"/product/attr/list",
         component:()=>import('@/views/product/attr/index.vue'),
         meta:{
@@ -65,6 +81,7 @@ import type { RouteRecordRaw } from 'vue-router';
         }
       },
       {
+        name:"Spu",
         path:"/product/spu/list",
         component:()=>import('@/views/product/spu/index.vue'),
         meta:{
@@ -72,6 +89,7 @@ import type { RouteRecordRaw } from 'vue-router';
         }
       },
       {
+        name:"Sku",
         path:"/product/sku/list",
         component:()=>import('@/views/product/sku/index.vue'),
         meta:{
@@ -79,6 +97,7 @@ import type { RouteRecordRaw } from 'vue-router';
         }
       },
       {
+        name:"Category",
         path:"/product/category/list",
         component:()=>import('@/views/product/category/index.vue'),
         meta:{
@@ -90,8 +109,11 @@ import type { RouteRecordRaw } from 'vue-router';
       title:"商品管理",
       icon:"ele-ShoppingBag"
     }
-  },
+  }
+];
 
+// 该数组只留任意路由
+export const anyRoutes: Array<RouteRecordRaw> = [
   /* 匹配任意的路由 必须最后注册 */
   { 
     path: '/:pathMatch(.*)', 
@@ -102,9 +124,3 @@ import type { RouteRecordRaw } from 'vue-router';
     }
   }
 ];
-
-
-/**
- * 定义动态路由
- */
-export const allAsyncRoutes: Array<RouteRecordRaw> = [];

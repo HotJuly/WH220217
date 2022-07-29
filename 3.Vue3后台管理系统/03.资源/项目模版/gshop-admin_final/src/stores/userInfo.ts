@@ -88,7 +88,7 @@ export const useUserInfoStore = defineStore('userInfo', {
       this.avatar = info.avatar
       this.authBtnList = info.buttons
       this.roles = info.roles
-      console.log(router.getRoutes())
+      // console.log(router.getRoutes())
       this.setRoutes(info.routes)
     },
 

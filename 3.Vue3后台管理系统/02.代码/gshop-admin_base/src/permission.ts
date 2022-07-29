@@ -46,6 +46,7 @@ router.beforeEach(async (to, from, next) => {
           // 异步请求获取用户信息(包含权限数据) ==> 动态注册用户的权限路由 => 当次跳转不可见
           await userInfoStore.getInfo()
           next(to) // 重新跳转去目标路由, 能看到动态添加的异步路由, 且不会丢失参数
+          // next(to) // 重新跳转去目标路由, 能看到动态添加的异步路由, 且不会丢失参数
           NProgress.done() // 结束进度条
 
         } catch (error: any) { // 如果请求处理过程中出错
