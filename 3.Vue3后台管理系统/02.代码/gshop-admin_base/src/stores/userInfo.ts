@@ -5,6 +5,7 @@ import {ElMessage} from 'element-plus'
 import {staticRoutes, allAsyncRoutes, anyRoutes} from '@/router/routes'
 import router from '@/router'
 import type { RouteRecordRaw } from 'vue-router';
+import {cloneDeep} from 'lodash';
 
 import {loginApi,getUserInfoApi} from '@/api/acl/login';
 
@@ -50,6 +51,22 @@ function addRoutes(asyncRoutes:RouteRecordRaw[]){
     router.addRoute(routeObj)
   })
   // console.log(router.getRoutes())
+}
+
+function  resetRoutes(){
+  // router.getRoutes()可以获取到当前一共注册了哪些路由
+  const routes = router.getRoutes();
+  // 将所有的带名字的路由全部删除
+  routes.forEach((routeObj)=>{
+    if(routeObj.name){
+      router.removeRoute(routeObj.name);
+    }
+  });
+
+  // 重新把常量路由进行一波注册
+  staticRoutes.forEach((routeObj)=>{
+    router.addRoute(routeObj)
+  });
 }
 
 /**
@@ -130,20 +147,23 @@ export const useUserInfoStore = defineStore('userInfo', {
     },
 
     reset () {
+
+      resetRoutes();
       // 删除local中保存的token
       removeToken()
       // 提交重置用户信息的mutation
       this.token = ''
       this.name = ''
       this.avatar = ''
+      this.menuRoutes = []
     },
 
     setRoutes(routeNames:string[]){
       // 根据服务器返回的routeNames数组以及项目中切割出来的异步路由数组,实现异步过滤效果
       // 只留下用户能访问的异步路由信息
 
-      const asyncRoutes = filterAsyncRoutes(allAsyncRoutes,routeNames);
-      console.log(asyncRoutes)
+      const asyncRoutes = filterAsyncRoutes(cloneDeep(allAsyncRoutes),routeNames);
+      // console.log(asyncRoutes)
       // 根据过滤完的异步路由数组,来遍历动态注入
       addRoutes(asyncRoutes);
       addRoutes(anyRoutes);

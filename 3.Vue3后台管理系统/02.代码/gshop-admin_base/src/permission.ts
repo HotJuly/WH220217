@@ -37,6 +37,8 @@ router.beforeEach(async (to, from, next) => {
       NProgress.done()
     } else { // 请求的不是登陆路由
       // 是否已经登陆
+      // const hasLogin = !(!userInfoStore.name)
+      // const hasLogin = Boolean(userInfoStore.name)
       const hasLogin = !!userInfoStore.name
       // 如果已经登陆直接放行
       if (hasLogin) {
@@ -45,8 +47,9 @@ router.beforeEach(async (to, from, next) => {
         try {
           // 异步请求获取用户信息(包含权限数据) ==> 动态注册用户的权限路由 => 当次跳转不可见
           await userInfoStore.getInfo()
+          // Vue-Router的缺点:刚使用addRoute方法注入的路由,无法立即跳转,只有在下一次跳转的时候才会有效
+          // next() // 重新跳转去目标路由, 能看到动态添加的异步路由, 且不会丢失参数
           next(to) // 重新跳转去目标路由, 能看到动态添加的异步路由, 且不会丢失参数
-          // next(to) // 重新跳转去目标路由, 能看到动态添加的异步路由, 且不会丢失参数
           NProgress.done() // 结束进度条
 
         } catch (error: any) { // 如果请求处理过程中出错
