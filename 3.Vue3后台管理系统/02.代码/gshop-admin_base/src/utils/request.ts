@@ -21,7 +21,8 @@ service.interceptors.request.use((config) => {
   const userInfoStore = useUserInfoStore(pinia);
   // 在发送请求之前做些什么 token
   if (userInfoStore.token) {
-    (<any>config.headers)["token"] = userInfoStore.token;
+    // (<any>config.headers)["token"] = userInfoStore.token;
+    (config.headers as any)["token"] = userInfoStore.token;
   }
   return config;
 });

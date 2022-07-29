@@ -117,10 +117,14 @@ const showPwd = () => {
 点击登陆的回调
 */
 const handleLogin = async () => {
+  // 实现统一表单校验,validate方法会返回一个promise对象,如果校验通过就会变为成功状态
   await formRef.value?.validate()
   loading.value = true
   const {username, password} = loginForm.value
   try {
+    // 调用pinia中的action实现登录功能,
+    // 注意:登录功能只是将用户的用户名和密码兑换成了token,并没有得到用户的相关信息
+    
     await userInfoStore.login(username, password)
     router.push({ path: redirect.value || '/' })
   } finally {

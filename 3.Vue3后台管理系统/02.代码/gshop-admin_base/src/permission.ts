@@ -14,6 +14,12 @@ const userInfoStore = useUserInfoStore(pinia)
 const whiteList = ['/login']
 
 // 路由加载前
+// 全局前置守卫
+// 当路由跳转触发,即将跳转之前会执行该导航守卫
+// 回调函数会接受三个参数,
+// 第一个to:是你想跳转的路由信息
+// 第二个from:是你准备离开的路由信息
+// 第三个next:是一个回调函数,调用该函数可以控制路由的跳转
 router.beforeEach(async (to, from, next) => {
    // 在显示进度条
    NProgress.start()
@@ -56,6 +62,7 @@ router.beforeEach(async (to, from, next) => {
     }
   } else { // 没有token
     // 如果目标路径在白名单中(是不需要token的路径)
+    // indexof如果返回值为-1代表不存在,不等于-1就是找到了
     if (whiteList.indexOf(to.path) !== -1) {
       // 放行
       next()
@@ -69,6 +76,8 @@ router.beforeEach(async (to, from, next) => {
 })
 
 // 路由加载后
+// 全局后置守卫
+// 当路由跳转结束之后,到达了目的地之后才会执行该导航守卫
 router.afterEach(() => {
 	NProgress.done();
 })

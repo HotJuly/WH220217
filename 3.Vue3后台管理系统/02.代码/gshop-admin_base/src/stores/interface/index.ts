@@ -6,6 +6,10 @@ export interface UserInfoState {
 	avatar: string;
 	name: string;
 
+  roles:string[];
+  buttons:string[];
+  routeNames:string[];
+
   menuRoutes: RouteRecordRaw[] // 用于生成导航菜单的路由列表
 }
 
